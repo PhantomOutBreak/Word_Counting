@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="th" data-bs-theme="auto"> <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เครื่องนับคำและตัวอักษร (Bootstrap + Dark Mode)</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        /* (Optional) เพิ่มสไตล์เล็กน้อยถ้าต้องการ */
+        body {
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+        }
+        .counter-results span {
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-left: 5px;
+        }
+        /* ทำให้ textarea สูงขึ้นเล็กน้อย */
+        #textInput {
+             min-height: 200px;
+        }
+        /* จัดปุ่มสลับธีม */
+        .theme-toggle {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 1050; /* อยู่เหนือองค์ประกอบอื่น */
+        }
+    </style>
+</head>
+<body>
+    <nav>
+    <a href ="index.html" class="btn btn-secondary btn-lg shadow-sm rounded-pill">ClipBoard
+    </a>
+    <button id="themeToggleBtn" class="btn btn-secondary theme-toggle">
+        <i id="themeIcon" class="bi"></i> <span id="themeText"></span>
+    </button>
+</nav>
+
+    <div class="container">
+        <h1 class="text-center mb-4">เครื่องนับคำและตัวอักษร</h1>
+
+        <div class="mb-3">
+            <label for="textInput" class="form-label">ข้อความ:</label>
+            <textarea class="form-control" id="textInput" rows="8" placeholder="วางหรือพิมพ์ข้อความของคุณที่นี่..."></textarea>
+        </div>
+
+        <div class="card border-primary">
+            <div class="card-body text-primary-emphasis bg-primary-subtle">
+                <div class="d-flex justify-content-between flex-wrap">
+                     <p class="mb-0 me-3">จำนวนตัวอักษร: <span id="charCount">0</span></p>
+                     <p class="mb-0">จำนวนคำ: <span id="wordCount">0</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+    <script>
+        // --- ส่วนนับคำและตัวอักษร (เหมือนเดิม) ---
+        const textInput = document.getElementById('textInput');
+        const charCountSpan = document.getElementById('charCount');
+        const wordCountSpan = document.getElementById('wordCount');
+
+        textInput.addEventListener('input', () => {
+            const text = textInput.value;
+            const charCount = text.length;
+            charCountSpan.textContent = charCount;
+
+            const words = text.trim().split(/\s+/).filter(word => word !== '');
+            const wordCount = text.trim() === '' ? 0 : words.length;
+            wordCountSpan.textContent = wordCount;
+        });
+
+        // --- ส่วนจัดการ Theme (Light/Dark/Auto) ---
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
+        const themeIcon = document.getElementById('themeIcon');
+        const themeText = document.getElementById('themeText');
+        const htmlElement = document.documentElement; // อ้างอิงถึง <html> tag
+
+        // ฟังก์ชันสำหรับตั้งค่า Theme และ Icon/Text ของปุ่ม
+        const setTheme = (theme) => {
+            htmlElement.setAttribute('data-bs-theme', theme);
+            localStorage.setItem('theme', theme); // บันทึกการตั้งค่า
+
+            if (theme === 'light') {
+                themeIcon.className = 'bi bi-sun-fill';
+                themeText.textContent = ' Light';
+            } else if (theme === 'dark') {
+                themeIcon.className = 'bi bi-moon-stars-fill';
+                themeText.textContent = ' Dark';
+            } else { // auto
+                themeIcon.className = 'bi bi-circle-half';
+                themeText.textContent = ' Auto';
+            }
+        };
+
+        // อ่านค่า Theme ที่บันทึกไว้ หรือใช้ 'auto' เป็นค่าเริ่มต้น
+        const savedTheme = localStorage.getItem('theme') || 'auto';
+        setTheme(savedTheme);
+
+        // Event Listener สำหรับปุ่ม Toggle
+        themeToggleBtn.addEventListener('click', () => {
+            let currentTheme = htmlElement.getAttribute('data-bs-theme');
+
+            // วนรอบการสลับ: light -> dark -> auto -> light ...
+            let nextTheme;
+            if (currentTheme === 'light') {
+                nextTheme = 'dark';
+            } else if (currentTheme === 'dark') {
+                nextTheme = 'auto';
+            } else { // currentTheme is 'auto' or something else
+                nextTheme = 'light';
+            }
+            setTheme(nextTheme);
+        });
+
+        // (ทางเลือก) ถ้าต้องการให้โหมด Auto อัปเดตตาม OS ทันที (ต้องใช้ media query listener)
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            if (htmlElement.getAttribute('data-bs-theme') === 'auto') {
+                // ไม่ต้องทำอะไร เพราะ Bootstrap จัดการให้อยู่แล้วเมื่อ data-bs-theme="auto"
+                // แค่ต้องแน่ใจว่า icon/text ของปุ่มถูกต้อง (อาจต้องเรียก setTheme('auto') อีกครั้ง)
+                // setTheme('auto'); // อาจไม่จำเป็น ถ้า UI ปุ่มไม่เปลี่ยนตาม OS
+            }
+        });
+
+    </script>
+
+</body>
+</html>

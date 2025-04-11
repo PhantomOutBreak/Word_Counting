@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>คลิปบอร์ดออนไลน์</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #ffffff;
+      --text-color: #000000;
+      --card-bg: #f8f9fa;
+    }
+    body.dark-mode {
+      --bg-color: #343a40;
+      --text-color: #ffffff;
+      --card-bg: #495057;
+    }
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      transition: all 0.3s ease;
+    }
+    .card {
+      background-color: var(--card-bg);
+    }
+    .navbar {
+      position: fixed;
+      top: 0;
+      right: 0;
+      z-index: 1000;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <a href="wordcount.html" class="btn btn-secondary btn-lg shadow-sm rounded-pill" id="wordCountBtn">
+      📝 Word Count
+    </a>
+    
+    <div class="dropdown">
+      <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="themeDropdown" data-bs-toggle="dropdown">
+        โหมด
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="themeDropdown">
+        <li><a class="dropdown-item" href="#" onclick="setTheme('light')">Light</a></li>
+        <li><a class="dropdown-item" href="#" onclick="setTheme('dark')">Dark</a></li>
+        <li><a class="dropdown-item" href="#" onclick="setTheme('auto')">Auto</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="container mt-5 pt-5">
+    <div class="row justify-content-center">
+      <div class="col-md-8">
+        <div class="card shadow">
+          <div class="card-body">
+            <h1 class="card-title text-center mb-4">คลิปบอร์ดออนไลน์</h1>
+            <div class="mb-3">
+              <input type="password" id="userId" class="form-control" placeholder="ป้อน ID ของคุณ">
+            </div>
+            <div class="mb-3">
+              <textarea id="clipInput" class="form-control" placeholder="ป้อนข้อความที่นี่" rows="3"></textarea>
+            </div>
+            <div class="d-grid gap-2 mb-3">
+              <button class="btn btn-primary" onclick="saveClip()">บันทึก</button>
+              <button class="btn btn-secondary" onclick="loadClips()">โหลดข้อมูล</button>
+            </div>
+            <ul id="clipsList" class="list-group"></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // ฟังก์ชันเข้ารหัส Base64
+    function encodeBase64(str) {
+      try {
+        return btoa(unescape(encodeURIComponent(str)));
+      } catch (err) {
+        console.error('Error encoding:', err);
+        throw new Error('Invalid input for encoding');
+      }
+    }
+
+    async function saveClip() {
+      const id = document.getElementById('userId').value;
+      const clip = document.getElementById('clipInput').value;
+      if (!id || !clip) {
+        alert('กรุณาป้อน ID และข้อความ');
+        return;
+      }
+      try {
+        const encodedId = encodeBase64(id);
+        const encodedClip = encodeBase64(clip); // เข้ารหัส clip ด้วย
+        const response = await fetch('/save', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: encodedId, clip: encodedClip })
+        });
+        const result = await response.json();
+        if (response.ok) {
+          alert(result.message);
+          document.getElementById('clipInput').value = '';
+        } else {
+          alert(result.error || 'เกิดข้อผิดพลาด');
+        }
+      } catch (err) {
+        alert('ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์');
+        console.error(err);
+      }
+    }
+
+    async function loadClips() {
+      const id = document.getElementById('userId').value;
+      if (!id) {
+        alert('กรุณาป้อน ID');
+        return;
+      }
+      try {
+        const encodedId = encodeBase64(id);
+        const response = await fetch(`/clips?id=${encodedId}`);
+        if (!response.ok) {
+          throw new Error('ไม่สามารถดึงข้อมูลได้');
+        }
+        const clips = await response.json();
+        const clipsList = document.getElementById('clipsList');
+        clipsList.innerHTML = '';
+        clips.forEach(item => {
+          const li = document.createElement('li');
+          li.className = 'list-group-item';
+          li.textContent = item.clip; // clip ถูกถอดรหัสแล้วในเซิร์ฟเวอร์
+          clipsList.appendChild(li);
+        });
+      } catch (err) {
+        alert('ไม่สามารถโหลดข้อมูลได้');
+        console.error(err);
+      }
+    }
+
+    function setTheme(theme) {
+      if (theme === 'auto') {
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.body.classList.toggle('dark-mode', prefersDark);
+      } else {
+        document.body.classList.toggle('dark-mode', theme === 'dark');
+      }
+      localStorage.setItem('theme', theme);
+    }
+
+    const savedTheme = localStorage.getItem('theme') || 'auto';
+    setTheme(savedTheme);
+  </script>
+</body>
+</html>
