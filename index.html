@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="th" data-bs-theme="auto">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เครื่องนับคำและตัวอักษร | Word Counter</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        :root {
+            --transition-speed: 0.3s;
+        }
+        
+        body {
+            padding-top: 2rem;
+            padding-bottom: 2rem;
+            transition: background-color var(--transition-speed), color var(--transition-speed);
+        }
+        
+        .counter-card {
+            border-radius: 12px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .counter-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+        }
+        
+        .counter-value {
+            font-weight: bold;
+            font-size: 1.8em;
+            display: block;
+            margin-top: 0.5rem;
+        }
+        
+        .counter-label {
+            font-size: 0.9em;
+            opacity: 0.8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .header-container {
+            position: relative;
+            margin-bottom: 2.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(var(--bs-primary-rgb), 0.3);
+        }
+        
+        #textInput {
+            min-height: 220px;
+            resize: vertical;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            border-radius: 10px;
+            font-size: 1.05rem;
+            padding: 1rem;
+        }
+        
+        #textInput:focus {
+            box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
+        }
+        
+        .theme-toggle {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 1050;
+            border-radius: 50%;
+            width: 46px;
+            height: 46px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s, transform 0.2s;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .theme-toggle:hover {
+            transform: scale(1.1);
+        }
+        
+        .theme-toggle .bi {
+            font-size: 1.3rem;
+        }
+        
+        .clipboard-btn {
+            border-radius: 50px;
+            padding-left: 1.25rem;
+            padding-right: 1.25rem;
+            transition: all 0.2s;
+        }
+        
+        .clipboard-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .app-title {
+            font-weight: 700;
+            display: inline-block;
+            background: linear-gradient(45deg, var(--bs-primary), #6610f2);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .action-buttons {
+            margin-top: 1.5rem;
+            display: flex;
+            gap: 0.75rem;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Dark mode specific styles */
+        [data-bs-theme="dark"] .app-title {
+            background: linear-gradient(45deg, #8ab4f8, #c58af9);
+            -webkit-background-clip: text;
+            background-clip: text;
+        }
+        
+        [data-bs-theme="dark"] .counter-card {
+            background-color: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <button id="themeToggleBtn" class="btn btn-light theme-toggle shadow">
+        <i id="themeIcon" class="bi"></i>
+    </button>
+
+    <div class="container">
+        <div class="header-container">
+            <h1 class="text-center app-title">เครื่องนับคำและตัวอักษร</h1>
+            <p class="text-center text-muted">นับคำและตัวอักษรในข้อความของคุณแบบเรียลไทม์</p>
+        </div>
+
+        <div class="mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <label for="textInput" class="form-label fs-5">ข้อความของคุณ:</label>
+                <span id="saveStatus" class="small text-muted"></span>
+            </div>
+            <textarea class="form-control shadow-sm" id="textInput" 
+                      placeholder="วางหรือพิมพ์ข้อความของคุณที่นี่..." 
+                      autofocus></textarea>
+            
+            <div class="action-buttons">
+                <button id="clearBtn" class="btn btn-outline-secondary clipboard-btn shadow-sm">
+                    <i class="bi bi-trash"></i> ล้างข้อความ
+                </button>
+                <button id="copyBtn" class="btn btn-outline-primary clipboard-btn shadow-sm">
+                    <i class="bi bi-clipboard"></i> คัดลอก
+                </button>
+            </div>
+        </div>
+
+        <div class="stats-container">
+            <div class="counter-card card border-0 bg-primary-subtle text-primary-emphasis p-3">
+                <div class="counter-label">ตัวอักษร</div>
+                <span id="charCount" class="counter-value">0</span>
+            </div>
+            
+            <div class="counter-card card border-0 bg-info-subtle text-info-emphasis p-3">
+                <div class="counter-label">คำ</div>
+                <span id="wordCount" class="counter-value">0</span>
+            </div>
+            
+            <div class="counter-card card border-0 bg-success-subtle text-success-emphasis p-3">
+                <div class="counter-label">บรรทัด</div>
+                <span id="lineCount" class="counter-value">0</span>
+            </div>
+            
+            <div class="counter-card card border-0 bg-warning-subtle text-warning-emphasis p-3">
+                <div class="counter-label">ไม่รวมช่องว่าง</div>
+                <span id="charNoSpaceCount" class="counter-value">0</span>
+            </div>
+        </div>
+        
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+    <script>
+        // DOM Elements
+        const textInput = document.getElementById('textInput');
+        const charCountSpan = document.getElementById('charCount');
+        const wordCountSpan = document.getElementById('wordCount');
+        const lineCountSpan = document.getElementById('lineCount');
+        const charNoSpaceCountSpan = document.getElementById('charNoSpaceCount');
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
+        const themeIcon = document.getElementById('themeIcon');
+        const clearBtn = document.getElementById('clearBtn');
+        const copyBtn = document.getElementById('copyBtn');
+        const saveStatus = document.getElementById('saveStatus');
+        const htmlElement = document.documentElement;
+        
+        // Count function
+        const countText = () => {
+            const text = textInput.value;
+            
+            // Character count
+            const charCount = text.length;
+            charCountSpan.textContent = charCount.toLocaleString();
+            
+            // Word count
+            const words = text.trim().split(/\s+/).filter(word => word !== '');
+            const wordCount = text.trim() === '' ? 0 : words.length;
+            wordCountSpan.textContent = wordCount.toLocaleString();
+            
+            // Line count
+            const lineCount = text === '' ? 0 : text.split(/\r\n|\r|\n/).length;
+            lineCountSpan.textContent = lineCount.toLocaleString();
+            
+            // Characters without spaces
+            const charNoSpaceCount = text.replace(/\s+/g, '').length;
+            charNoSpaceCountSpan.textContent = charNoSpaceCount.toLocaleString();
+            
+            // Save to localStorage
+            localStorage.setItem('savedText', text);
+            
+            if (text.length > 0) {
+                saveStatus.textContent = "บันทึกอัตโนมัติแล้ว";
+                setTimeout(() => {
+                    saveStatus.textContent = "";
+                }, 2000);
+            }
+        };
+        
+        // Load saved text from localStorage
+        const loadSavedText = () => {
+            const savedText = localStorage.getItem('savedText');
+            if (savedText) {
+                textInput.value = savedText;
+                countText();
+            }
+        };
+        
+        // Clear text function
+        const clearText = () => {
+            if (textInput.value !== '') {
+                if (confirm('คุณต้องการล้างข้อความทั้งหมดใช่หรือไม่?')) {
+                    textInput.value = '';
+                    localStorage.removeItem('savedText');
+                    countText();
+                    textInput.focus();
+                }
+            }
+        };
+        
+        // Copy text function
+        const copyText = () => {
+            if (textInput.value !== '') {
+                textInput.select();
+                document.execCommand('copy');
+                
+                // Create a temporary success message
+                const originalText = copyBtn.innerHTML;
+                copyBtn.innerHTML = '<i class="bi bi-check2"></i> คัดลอกแล้ว!';
+                copyBtn.classList.remove('btn-outline-primary');
+                copyBtn.classList.add('btn-success');
+                
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalText;
+                    copyBtn.classList.remove('btn-success');
+                    copyBtn.classList.add('btn-outline-primary');
+                }, 2000);
+            }
+        };
+        
+        // Theme functions
+        const setTheme = (theme) => {
+            htmlElement.setAttribute('data-bs-theme', theme);
+            localStorage.setItem('theme', theme);
+            
+            if (theme === 'light') {
+                themeIcon.className = 'bi bi-sun-fill';
+                themeToggleBtn.setAttribute('title', 'โหมดสว่าง');
+            } else if (theme === 'dark') {
+                themeIcon.className = 'bi bi-moon-stars-fill';
+                themeToggleBtn.setAttribute('title', 'โหมดมืด');
+            } else { // auto
+                themeIcon.className = 'bi bi-circle-half';
+                themeToggleBtn.setAttribute('title', 'โหมดอัตโนมัติ');
+            }
+        };
+        
+        const toggleTheme = () => {
+            let currentTheme = htmlElement.getAttribute('data-bs-theme');
+            
+            let nextTheme;
+            if (currentTheme === 'light') {
+                nextTheme = 'dark';
+            } else if (currentTheme === 'dark') {
+                nextTheme = 'auto';
+            } else {
+                nextTheme = 'light';
+            }
+            
+            setTheme(nextTheme);
+            
+            // Add animation effect on theme change
+            document.body.style.transition = 'background-color 0.3s, color 0.3s';
+            setTimeout(() => {
+                document.body.style.transition = '';
+            }, 300);
+        };
+        
+        // Event Listeners
+        textInput.addEventListener('input', countText);
+        clearBtn.addEventListener('click', clearText);
+        copyBtn.addEventListener('click', copyText);
+        themeToggleBtn.addEventListener('click', toggleTheme);
+        
+        // Auto update theme on OS preference change
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+            if (htmlElement.getAttribute('data-bs-theme') === 'auto') {
+                // Just refresh theme icon
+                setTheme('auto');
+            }
+        });
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            // Ctrl+Shift+L to clear text
+            if (e.ctrlKey && e.shiftKey && e.key === 'L') {
+                e.preventDefault();
+                clearText();
+            }
+            
+            // Ctrl+Shift+C to copy text
+            if (e.ctrlKey && e.shiftKey && e.key === 'C') {
+                e.preventDefault();
+                copyText();
+            }
+        });
+        
+        // Initialize
+        const initApp = () => {
+            // Set theme from localStorage or default to auto
+            const savedTheme = localStorage.getItem('theme') || 'auto';
+            setTheme(savedTheme);
+            
+            // Load saved text
+            loadSavedText();
+            
+            // Add fade-in effect on load
+            document.querySelectorAll('.counter-card').forEach(card => {
+                card.classList.add('fade-in');
+            });
+        };
+        
+        // Initialize app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
