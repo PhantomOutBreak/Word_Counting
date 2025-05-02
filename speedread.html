@@ -12,52 +12,56 @@
     <!-- Google Fonts สำหรับภาษาไทย -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap">
     <style>
+        /* ---------------------------
+           CSS Variables & Global Styles
+        --------------------------- */
         :root {
             --primary-color: #0d6efd;
             --accent-color: #fd7e14;
             --highlight-color: #ff0019;
             --success-color: #1eff00;
             --navbar-height: 72px;
-            
-            /* สีสำหรับ navbar animation */
+            --body-bg: #ffffff;
+            --body-color: #212529;
+            --card-bg: #f8f9fa;
+            --card-border-color: #dee2e6;
+            /* Colors for navbar gradient animation */
             --color-1: #4e54c8;
             --color-2: #8f94fb;
             --color-3: #bc4e9c;
             --color-4: #f80759;
-            --color-5: #11998e;
+            --color-5: #db5aff;
             --color-6: #38ef7d;
         }
 
-        .dark-mode {
-            --bs-body-bg: #121212;
-            --bs-body-color: #e0e0e0;
-            --bs-card-bg: #1e1e1e;
-            --bs-card-border-color: #333;
+        [data-bs-theme="dark"] {
+            --body-bg: #121212;
+            --body-color: #e0e0e0;
+            --card-bg: #1e1e1e;
+            --card-border-color: #333333;
             --primary-color: #835ce7;
             --accent-color: #ff9f43;
             --highlight-color: #ff6b6b;
             --success-color: #00e676;
-            
-            /* สีพื้นหลังหลัก: #1E293B; /* Deep Charcoal */
-            --color-1: #000000;
-            /* สีพื้นหลังรอง/เน้น (Gradient Start): #374151; /* Slate Gray */
-            --color-2: #028400;
-            /* สีพื้นหลังส่วนประกอบ (Gradient End): #4B5563; /* Grayish Blue */
-            --color-3: #0ac300;
-            /* สีเน้นสำหรับแอนิเมชัน/โต้ตอบ (Bright Accent): #6EE7B7; /* Mint Green */
-            --color-4: #00ff1e;
-            /* สีข้อความหลัก (Light Text): #F9FAFB; /* Off-White */
-            --color-5: #6aff00;
-            /* สีเน้นข้อความ/สัญลักษณ์ (Subtle Accent): #A1A1AA; /* Medium Gray */
-            --color-6: #eeff00;
+            --color-1: #959800;
+            --color-2: #028e00;
+            --color-3: #00c099;
+            --color-4: #0055aa;
+            --color-5: #5c00b8;
+            --color-6: #a10000;
         }
 
         body {
             font-family: 'Sarabun', sans-serif;
+            background-color: var(--body-bg);
+            color: var(--body-color);
             transition: background-color 0.3s, color 0.3s;
-            padding-top: var(--navbar-height); /* ให้พื้นที่สำหรับ navbar fixed-top */
+            padding-top: var(--navbar-height); /* Leave space for fixed navbar */
         }
 
+        /* ---------------------------
+           Navbar & Animation
+        --------------------------- */
         .navbar {
             position: fixed;
             top: 0;
@@ -68,42 +72,38 @@
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             overflow: hidden;
         }
-        
+
+        /* ปรับปรุงการแสดงผล Navbar สีให้เปลี่ยนแบบไหลลื่นทั่วแถบ */
         .navbar-bg {
             position: absolute;
             top: 0;
             left: 0;
-            width: 200%;
+            width: 100%;
             height: 100%;
-            background: linear-gradient(
-                90deg,
+            background: linear-gradient(90deg,
                 var(--color-1),
                 var(--color-2),
                 var(--color-3),
                 var(--color-4),
                 var(--color-5),
-                var(--color-6),
-                var(--color-1)
+                var(--color-6)
             );
-            animation: animateGradient 12s linear infinite;
+            background-size: 300% 300%;
+            animation: gradientShift 12s ease infinite;
             z-index: -1;
         }
-        
-        @keyframes animateGradient {
-            0% {
-                transform: translateX(0);
-            }
-            100% {
-                transform: translateX(-50%);
-            }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
-        
+
         .navbar-reading .navbar-bg {
-            animation-duration: 6s !important; /* เร็วขึ้นเมื่อกำลังอ่าน */
+            animation-duration: 6s !important;
         }
-        
-        /* สไตล์สำหรับทำให้ข้อความอ่านได้ง่ายเมื่ออยู่บน gradient */
-        .navbar .navbar-brand, 
+
+        .navbar .navbar-brand,
         .navbar .nav-link,
         .navbar .navbar-text,
         .navbar-toggler-icon {
@@ -123,8 +123,8 @@
 
         .nav-link {
             font-weight: 500;
-            position: relative;
             padding: 0.5rem 1rem;
+            position: relative;
         }
 
         .nav-link::after {
@@ -142,15 +142,16 @@
             width: 100%;
         }
 
+        /* ---------------------------
+           Card & Display Styles
+        --------------------------- */
         .card {
+            background-color: var(--card-bg);
+            border-color: var(--card-border-color);
             transition: background-color 0.3s, border-color 0.3s;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
             margin-bottom: 1.5rem;
             border-radius: 0.75rem;
-        }
-
-        .dark-mode .card {
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
         .display-word {
@@ -169,6 +170,9 @@
             font-weight: 700;
         }
 
+        /* ---------------------------
+           Theme Toggle Button
+        --------------------------- */
         .btn-theme {
             width: 40px;
             height: 40px;
@@ -187,6 +191,9 @@
             transform: rotate(30deg);
         }
 
+        /* ---------------------------
+           Timer Style
+        --------------------------- */
         .timer {
             background-color: var(--accent-color);
             color: white;
@@ -206,6 +213,7 @@
 </head>
 
 <body>
+    <!-- Navbar with Theme Toggle -->
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="navbar-bg"></div>
         <div class="container">
@@ -220,16 +228,17 @@
     </nav>
 
     <div class="container py-4">
+        <!-- Card: Text Input -->
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">ข้อความของคุณ</h5>
             </div>
             <div class="card-body">
-                <textarea id="text-input" class="form-control mb-3" rows="4" 
-                    placeholder="พิมพ์หรือวางข้อความที่นี่..."></textarea>
+                <textarea id="text-input" class="form-control mb-3" rows="4" placeholder="พิมพ์หรือวางข้อความที่นี่..."></textarea>
             </div>
         </div>
 
+        <!-- Card: Settings -->
         <div class="card">
             <div class="card-header">
                 <h5 class="mb-0">การตั้งค่า</h5>
@@ -242,7 +251,6 @@
                         <span id="speed-value" class="badge bg-primary px-3 py-2">300</span>
                     </div>
                 </div>
-
                 <div class="d-flex flex-wrap gap-2">
                     <button id="start" class="btn btn-primary">
                         <i class="fas fa-play me-2"></i> เริ่มอ่าน
@@ -260,6 +268,7 @@
             </div>
         </div>
 
+        <!-- Card: Reading Display -->
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">หน้าจอการอ่าน</h5>
@@ -277,26 +286,28 @@
             </div>
         </div>
 
+        <!-- Card: Reading Tips -->
         <div class="card" id="tips">
             <div class="card-header">
                 <h5 class="mb-0">เคล็ดลับการอ่านเร็ว</h5>
             </div>
             <div class="card-body">
                 <ul class="list-group list-group-flush">
-                    <li class="list-group-item">การฝึกอ่านแบบนี้ทุกวัน วันละ 10-15 นาทีจะช่วยเพิ่มความเร็วในการอ่านของคุณอย่างเห็นได้ชัด</li>
-                    <li class="list-group-item">เริ่มด้วยความเร็วที่คุณสบาย แล้วค่อยๆ เพิ่มขึ้นทีละ 50 คำต่อนาที</li>
-                    <li class="list-group-item">พยายามไม่อ่านออกเสียงในใจ (subvocalization) เพื่อเพิ่มความเร็ว</li>
-                    <li class="list-group-item">หลังจากอ่านเสร็จ ลองทบทวนว่าคุณเข้าใจเนื้อหาได้มากน้อยเพียงใด</li>
+                    <li class="list-group-item">ฝึกอ่านแบบนี้วันละ 10-15 นาทีเพื่อเพิ่มความเร็ว</li>
+                    <li class="list-group-item">เริ่มต้นด้วยความเร็วที่สบาย ค่อยๆ เพิ่มทีละ 50 คำต่อนาที</li>
+                    <li class="list-group-item">หลีกเลี่ยงการ subvocalization เพื่ออ่านเร็วขึ้น</li>
+                    <li class="list-group-item">หลังจากอ่านจบ ลองทบทวนความเข้าใจเนื้อหาที่อ่าน</li>
                 </ul>
             </div>
         </div>
 
+        <!-- Card: About -->
         <div class="card" id="about">
             <div class="card-header">
                 <h5 class="mb-0">เกี่ยวกับโปรแกรม</h5>
             </div>
             <div class="card-body">
-                <p class="mb-0">Speed Reader เป็นเครื่องมือออนไลน์ที่ช่วยให้คุณฝึกการอ่านเร็วผ่านการแสดงคำทีละคำ เทคนิคนี้ช่วยเพิ่มความเร็วในการอ่านและความเข้าใจ เหมาะสำหรับนักเรียน นักศึกษา และผู้ที่ต้องการพัฒนาทักษะการอ่าน</p>
+                <p class="mb-0">Speed Reader เป็นเครื่องมือออนไลน์ที่ช่วยให้คุณฝึกอ่านเร็วผ่านการแสดงคำทีละคำ เหมาะสำหรับนักเรียนและผู้ที่ต้องการพัฒนาทักษะการอ่าน</p>
             </div>
         </div>
     </div>
@@ -310,8 +321,10 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // ตัวแปรสำหรับองค์ประกอบ UI
+        document.addEventListener('DOMContentLoaded', function () {
+            // ---------------------------
+            // UI ELEMENTS & VARIABLES
+            // ---------------------------
             const startButton = document.getElementById('start');
             const pauseButton = document.getElementById('pause');
             const resetButton = document.getElementById('reset');
@@ -325,110 +338,116 @@
             const themeToggle = document.getElementById('theme-toggle');
             const timerElement = document.getElementById('timer');
             const navbar = document.querySelector('.navbar');
+            const htmlEl = document.documentElement;
 
-            // ตัวแปรสำหรับการจัดการข้อความและการอ่าน
+            // ---------------------------
+            // VARIABLES FOR READING & TIMER
+            // ---------------------------
             let words = [];
             let currentWordIndex = 0;
             let isPlaying = false;
             let timerId;
-            let isDarkMode = false;
+            let startTime, elapsedTime = 0, timerInterval;
 
-            // ตัวแปรสำหรับระบบจับเวลา
-            let startTime;
-            let elapsedTime = 0;
-            let timerInterval;
-
-            // Smooth scrolling สำหรับการกดลิงก์ใน navbar
-            document.querySelectorAll('.nav-link').forEach(link => {
-                link.addEventListener('click', function(e) {
-                    const target = document.querySelector(this.getAttribute('href'));
-                    if (target) {
-                        e.preventDefault();
-                        const navbarHeight = navbar.offsetHeight;
-                        window.scrollTo({
-                            top: target.offsetTop - navbarHeight - 16, // คำนวณระยะห่างอัตโนมัติตามความสูงของ navbar
-                            behavior: 'smooth'
-                        });
-                    }
-                });
-            });
-
-            // ฟังก์ชันสำหรับการสลับธีม
-            themeToggle.addEventListener('click', function() {
-                document.body.classList.toggle('dark-mode');
-                isDarkMode = document.body.classList.contains('dark-mode');
-                themeToggle.innerHTML = isDarkMode ? 
-                    '<i class="fas fa-moon text-white"></i>' : 
-                    '<i class="fas fa-sun text-white"></i>';
-                localStorage.setItem('darkMode', isDarkMode);
-            });
-
-            // โหลดการตั้งค่าธีมจาก localStorage
-            if (localStorage.getItem('darkMode') === 'true') {
-                document.body.classList.add('dark-mode');
-                themeToggle.innerHTML = '<i class="fas fa-moon text-white"></i>';
-                isDarkMode = true;
+            // ---------------------------
+            // THEME SYSTEM
+            // ---------------------------
+            function getStoredTheme() {
+                return localStorage.getItem('theme') || 'auto';
             }
-
-            // อัพเดทการแสดงค่าความเร็ว
-            speedSlider.addEventListener('input', function() {
-                speedValue.textContent = speedSlider.value;
-                if (isPlaying) {
-                    pauseReading();
-                    startReading();
+            function setTheme(mode) {
+                let applied = mode;
+                if (mode === 'auto') {
+                    applied = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
                 }
+                htmlEl.setAttribute('data-bs-theme', applied);
+                const icons = {
+                    light: '<i class="fas fa-sun text-white"></i>',
+                    dark: '<i class="fas fa-moon text-white"></i>',
+                    auto: '<i class="fas fa-circle-half-stroke text-white"></i>'
+                };
+                themeToggle.innerHTML = icons[mode];
+                localStorage.setItem('theme', mode);
+            }
+            themeToggle.addEventListener('click', function () {
+                const current = getStoredTheme();
+                let next;
+                if (current === 'auto') next = 'light';
+                else if (current === 'light') next = 'dark';
+                else next = 'auto';
+                setTheme(next);
             });
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function () {
+                if (getStoredTheme() === 'auto') setTheme('auto');
+            });
+            setTheme(getStoredTheme());
 
-            // ฟังก์ชันสำหรับการเริ่มอ่าน
-            startButton.addEventListener('click', function() {
-                if (!isPlaying) {
-                    startReading();
-                    startTimer();
-                    navbar.classList.add('navbar-reading');
+            // ---------------------------
+            // SPEED READING FUNCTIONS
+            // ---------------------------
+            // Process text into words array using Intl.Segmenter if available
+            function processText() {
+                const text = textInput.value.trim();
+                if (text) {
+                    if (window.Intl && Intl.Segmenter) {
+                        try {
+                            const segmenter = new Intl.Segmenter('th', { granularity: 'word' });
+                            words = Array.from(segmenter.segment(text))
+                                .filter(seg => seg.segment.trim().length > 0)
+                                .map(seg => seg.segment);
+                        } catch (e) {
+                            fallbackTextProcessing(text);
+                        }
+                    } else {
+                        fallbackTextProcessing(text);
+                    }
+                } else {
+                    words = [];
                 }
-            });
-
-            // ฟังก์ชันสำหรับการหยุดชั่วคราว
-            pauseButton.addEventListener('click', function() {
-                if (isPlaying) {
-                    pauseReading();
-                    pauseTimer();
-                    navbar.classList.remove('navbar-reading');
-                }
-            });
-
-            // ฟังก์ชันสำหรับการเริ่มใหม่
-            resetButton.addEventListener('click', function() {
-                resetReading();
-                resetTimer();
-                navbar.classList.remove('navbar-reading');
-            });
-
-            // อัพเดทข้อความเมื่อมีการแก้ไข
-            textInput.addEventListener('input', function() {
-                resetReading();
-                resetTimer();
-                processText();
                 updateWordCount();
-            });
-
-            // ฟังก์ชันเริ่มอ่าน
-            function startReading() {
-                if (currentWordIndex >= words.length) {
-                    resetReading();
-                }
-
+            }
+            // Fallback processing using regex split
+            function fallbackTextProcessing(text) {
+                const splitPattern = /[\s\.\,\;\:\!\?\(\)\[\]\{\}\"\'\-\+\=\_\<\>\/\|\\\~\`\@\#\$\%\^&\*]+/;
+                words = text.split(splitPattern).filter(word => word.length > 0);
+            }
+            // Update word count display
+            function updateWordCount() {
+                totalWordsElement.textContent = words.length + ' คำ';
+                currentWordElement.textContent = '0';
+            }
+            // Update progress bar and current word counter
+            function updateProgress() {
                 if (words.length === 0) {
-                    processText();
+                    progressBar.style.width = '0%';
+                    currentWordElement.textContent = '0';
+                    return;
                 }
-
+                const progress = (currentWordIndex / words.length) * 100;
+                progressBar.style.width = progress + '%';
+                currentWordElement.textContent = currentWordIndex;
+            }
+            // Display a word with its center letter highlighted
+            function displayWord(word) {
+                if (!word) {
+                    displayArea.textContent = "";
+                    return;
+                }
+                const orp = Math.max(1, Math.floor(word.length / 3));
+                const pre = word.substring(0, orp);
+                const highlight = word.substring(orp, orp + 1);
+                const post = word.substring(orp + 1);
+                displayArea.innerHTML = pre + '<span class="highlight">' + highlight + '</span>' + post;
+            }
+            // Start reading: cycle through words at speed defined by slider
+            function startReading() {
+                if (currentWordIndex >= words.length) resetReading();
+                if (words.length === 0) processText();
                 if (words.length === 0) return;
-
                 isPlaying = true;
-                let speed = parseInt(speedSlider.value);
-                let interval = 60000 / speed; // แปลง WPM เป็นมิลลิวินาที
-
-                timerId = setInterval(function() {
+                const speed = parseInt(speedSlider.value);
+                const interval = 60000 / speed;
+                timerId = setInterval(function () {
                     if (currentWordIndex < words.length) {
                         displayWord(words[currentWordIndex]);
                         updateProgress();
@@ -440,14 +459,11 @@
                     }
                 }, interval);
             }
-
-            // ฟังก์ชันหยุดอ่านชั่วคราว
             function pauseReading() {
                 clearInterval(timerId);
                 isPlaying = false;
             }
-
-            // ฟังก์ชันรีเซ็ตการอ่าน
+            // Reset reading and progress display
             function resetReading() {
                 pauseReading();
                 currentWordIndex = 0;
@@ -455,86 +471,18 @@
                 displayArea.textContent = "คำจะแสดงที่นี่";
             }
 
-            // ฟังก์ชันประมวลผลข้อความ
-            function processText() {
-                const text = textInput.value.trim();
-                if (text) {
-                    // ใช้ Intl.Segmenter สำหรับภาษาไทย ถ้ามี
-                    if (window.Intl && Intl.Segmenter) {
-                        try {
-                            const segmenter = new Intl.Segmenter('th', { granularity: 'word' });
-                            words = Array.from(segmenter.segment(text))
-                                .filter(seg => seg.segment.trim().length > 0)
-                                .map(seg => seg.segment);
-                        } catch (e) {
-                            // Fallback ถ้า Segmenter ไม่รองรับ
-                            fallbackTextProcessing(text);
-                        }
-                    } else {
-                        fallbackTextProcessing(text);
-                    }
-                    updateWordCount();
-                } else {
-                    words = [];
-                    updateWordCount();
-                }
-            }
-            
-            // Fallback สำหรับการประมวลผลข้อความถ้า Intl.Segmenter ไม่รองรับ
-            function fallbackTextProcessing(text) {
-                // แยกด้วยช่องว่างและอักขระพิเศษ
-                const splitPattern = /[\s\.\,\;\:\!\?\(\)\[\]\{\}\"\'\-\+\=\_\<\>\/\|\\\~\`\@\#\$\%\^\\&\*]+/;
-                words = text.split(splitPattern).filter(word => word.length > 0);
-            }
-
-            // อัพเดทจำนวนคำ
-            function updateWordCount() {
-                totalWordsElement.textContent = words.length + ' คำ';
-                currentWordElement.textContent = '0';
-            }
-
-            // อัพเดทความคืบหน้าการอ่าน
-            function updateProgress() {
-                if (words.length === 0) {
-                    progressBar.style.width = '0%';
-                    currentWordElement.textContent = '0';
-                    return;
-                }
-                
-                const progress = (currentWordIndex / words.length) * 100;
-                progressBar.style.width = progress + '%';
-                currentWordElement.textContent = currentWordIndex;
-            }
-
-            // แสดงคำปัจจุบัน
-            function displayWord(word) {
-                if (!word || word.length === 0) {
-                    displayArea.textContent = "";
-                    return;
-                }
-                
-                // เน้นตัวอักษรตรงกลางของคำ
-                let orp = Math.max(1, Math.floor(word.length / 3));
-                const pre = word.substring(0, orp);
-                const highlight = word.substring(orp, orp + 1);
-                const post = word.substring(orp + 1);
-                displayArea.innerHTML = pre + '<span class="highlight">' + highlight + '</span>' + post;
-            }
-
-            // ฟังก์ชันสำหรับระบบจับเวลา
+            // ---------------------------
+            // TIMER FUNCTIONS
+            // ---------------------------
             function startTimer() {
                 timerElement.classList.remove('d-none');
-                if (!startTime) {
-                    startTime = Date.now() - elapsedTime;
-                }
+                if (!startTime) startTime = Date.now() - elapsedTime;
                 timerInterval = setInterval(updateTimer, 1000);
             }
-
             function pauseTimer() {
                 clearInterval(timerInterval);
                 elapsedTime = Date.now() - startTime;
             }
-
             function resetTimer() {
                 clearInterval(timerInterval);
                 timerElement.textContent = "00:00";
@@ -542,19 +490,55 @@
                 startTime = null;
                 elapsedTime = 0;
             }
-
             function updateTimer() {
-                const currentTime = Date.now();
-                elapsedTime = currentTime - startTime;
-                
-                // แปลงเป็นรูปแบบ นาที:วินาที
+                elapsedTime = Date.now() - startTime;
                 const minutes = Math.floor(elapsedTime / 60000);
                 const seconds = Math.floor((elapsedTime % 60000) / 1000);
-                
                 timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
             }
 
-            // เริ่มต้นเมื่อโหลดหน้าเว็บ
+            // ---------------------------
+            // EVENT LISTENERS
+            // ---------------------------
+            // Update speed value and restart reading if playing
+            speedSlider.addEventListener('input', function () {
+                speedValue.textContent = speedSlider.value;
+                if (isPlaying) {
+                    pauseReading();
+                    startReading();
+                }
+            });
+            // Start reading with timer and navbar animation
+            startButton.addEventListener('click', function () {
+                if (!isPlaying) {
+                    startReading();
+                    startTimer();
+                    navbar.classList.add('navbar-reading');
+                }
+            });
+            // Pause reading and timer
+            pauseButton.addEventListener('click', function () {
+                if (isPlaying) {
+                    pauseReading();
+                    pauseTimer();
+                    navbar.classList.remove('navbar-reading');
+                }
+            });
+            // Reset reading and timer; remove reading animation class
+            resetButton.addEventListener('click', function () {
+                resetReading();
+                resetTimer();
+                navbar.classList.remove('navbar-reading');
+            });
+            // Process text on input change
+            textInput.addEventListener('input', function () {
+                resetReading();
+                resetTimer();
+                processText();
+                updateWordCount();
+            });
+
+            // Initialize text processing on page load
             processText();
             updateWordCount();
         });
