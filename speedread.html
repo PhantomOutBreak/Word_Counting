@@ -203,6 +203,35 @@
             margin-left: 1rem;
         }
 
+        /* ปรับสีของ input[type=range] ให้เห็นชัดใน light mode */
+        :root .form-range::-webkit-slider-runnable-track {
+            background: #c6c6c6;
+            height: 0.5rem;
+        }
+        :root .form-range::-webkit-slider-thumb {
+            background: var(--primary-color);
+        }
+        :root .form-range:focus::-webkit-slider-thumb {
+            box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.25);
+        }
+        :root .form-range::-moz-range-track {
+            background: #238ffc;
+            height: 0.5rem;
+        }
+        :root .form-range::-ms-fill-lower,
+        :root .form-range::-ms-fill-upper {
+            background: #dee2e6;
+        }
+        :root .form-range::-ms-thumb {
+            background: var(--primary-color);
+        }
+        :root .form-range:focus::-ms-thumb {
+            box-shadow: 0 0 0 0.25rem rgba(13,110,253,.25);
+        }
+        :root .form-range {
+            background-color: transparent;
+        }
+
         @media (max-width: 768px) {
             .display-word {
                 font-size: 2rem;
