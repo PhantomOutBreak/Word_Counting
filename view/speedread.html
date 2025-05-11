@@ -349,228 +349,79 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../model/speedread.model.js"></script>
+    <script src="../controller/speedread.controller.js"></script>
+    <!-- การแสดงผลคำที่อ่าน -->
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // ---------------------------
-            // UI ELEMENTS & VARIABLES
-            // ---------------------------
-            const startButton = document.getElementById('start');
-            const pauseButton = document.getElementById('pause');
-            const resetButton = document.getElementById('reset');
-            const speedSlider = document.getElementById('speed');
-            const speedValue = document.getElementById('speed-value');
-            const textInput = document.getElementById('text-input');
-            const displayArea = document.getElementById('display');
-            const progressBar = document.getElementById('progress-bar');
-            const currentWordElement = document.getElementById('current-word');
-            const totalWordsElement = document.getElementById('total-words');
-            const themeToggle = document.getElementById('theme-toggle');
-            const timerElement = document.getElementById('timer');
-            const navbar = document.querySelector('.navbar');
-            const htmlEl = document.documentElement;
+        class SpeedReadView {
+    constructor() {
+        this.displayArea = document.getElementById('display');
+        this.progressBar = document.getElementById('progress-bar');
+        this.currentWordElement = document.getElementById('current-word');
+        this.totalWordsElement = document.getElementById('total-words');
+        this.timerElement = document.getElementById('timer');
+        this.navbar = document.querySelector('.navbar');
+        this.speedValue = document.getElementById('speed-value');
+    }
 
-            // ---------------------------
-            // VARIABLES FOR READING & TIMER
-            // ---------------------------
-            let words = [];
-            let currentWordIndex = 0;
-            let isPlaying = false;
-            let timerId;
-            let startTime, elapsedTime = 0, timerInterval;
+    updateWordCount(total) {
+        this.totalWordsElement.textContent = total + ' คำ';
+        this.currentWordElement.textContent = '0';
+    }
 
-            // ---------------------------
-            // THEME SYSTEM
-            // ---------------------------
-            function getStoredTheme() {
-                return localStorage.getItem('theme') || 'auto';
-            }
-            function setTheme(mode) {
-                let applied = mode;
-                if (mode === 'auto') {
-                    applied = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-                }
-                htmlEl.setAttribute('data-bs-theme', applied);
-                const icons = {
-                    light: '<i class="fas fa-sun text-white"></i>',
-                    dark: '<i class="fas fa-moon text-white"></i>',
-                    auto: '<i class="fas fa-circle-half-stroke text-white"></i>'
-                };
-                themeToggle.innerHTML = icons[mode];
-                localStorage.setItem('theme', mode);
-            }
-            themeToggle.addEventListener('click', function () {
-                const current = getStoredTheme();
-                let next;
-                if (current === 'auto') next = 'light';
-                else if (current === 'light') next = 'dark';
-                else next = 'auto';
-                setTheme(next);
-            });
-            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function () {
-                if (getStoredTheme() === 'auto') setTheme('auto');
-            });
-            setTheme(getStoredTheme());
+    updateProgress(current, total) {
+        if (total === 0) {
+            this.progressBar.style.width = '0%';
+            this.currentWordElement.textContent = '0';
+            return;
+        }
+        const progress = (current / total) * 100;
+        this.progressBar.style.width = progress + '%';
+        this.currentWordElement.textContent = current;
+    }
 
-            // ---------------------------
-            // SPEED READING FUNCTIONS
-            // ---------------------------
-            // Process text into words array using Intl.Segmenter if available
-            function processText() {
-                const text = textInput.value.trim();
-                if (text) {
-                    if (window.Intl && Intl.Segmenter) {
-                        try {
-                            const segmenter = new Intl.Segmenter('th', { granularity: 'word' });
-                            words = Array.from(segmenter.segment(text))
-                                .filter(seg => seg.segment.trim().length > 0)
-                                .map(seg => seg.segment);
-                        } catch (e) {
-                            fallbackTextProcessing(text);
-                        }
-                    } else {
-                        fallbackTextProcessing(text);
-                    }
-                } else {
-                    words = [];
-                }
-                updateWordCount();
-            }
-            // Fallback processing using regex split
-            function fallbackTextProcessing(text) {
-                const splitPattern = /[\s\.\,\;\:\!\?\(\)\[\]\{\}\"\'\-\+\=\_\<\>\/\|\\\~\`\@\#\$\%\^&\*]+/;
-                words = text.split(splitPattern).filter(word => word.length > 0);
-            }
-            // Update word count display
-            function updateWordCount() {
-                totalWordsElement.textContent = words.length + ' คำ';
-                currentWordElement.textContent = '0';
-            }
-            // Update progress bar and current word counter
-            function updateProgress() {
-                if (words.length === 0) {
-                    progressBar.style.width = '0%';
-                    currentWordElement.textContent = '0';
-                    return;
-                }
-                const progress = (currentWordIndex / words.length) * 100;
-                progressBar.style.width = progress + '%';
-                currentWordElement.textContent = currentWordIndex;
-            }
-            // Display a word with its center letter highlighted
-            function displayWord(word) {
-                if (!word) {
-                    displayArea.textContent = "";
-                    return;
-                }
-                const orp = Math.max(1, Math.floor(word.length / 3));
-                const pre = word.substring(0, orp);
-                const highlight = word.substring(orp, orp + 1);
-                const post = word.substring(orp + 1);
-                displayArea.innerHTML = pre + '<span class="highlight">' + highlight + '</span>' + post;
-            }
-            // Start reading: cycle through words at speed defined by slider
-            function startReading() {
-                if (currentWordIndex >= words.length) resetReading();
-                if (words.length === 0) processText();
-                if (words.length === 0) return;
-                isPlaying = true;
-                const speed = parseInt(speedSlider.value);
-                const interval = 60000 / speed;
-                timerId = setInterval(function () {
-                    if (currentWordIndex < words.length) {
-                        displayWord(words[currentWordIndex]);
-                        updateProgress();
-                        currentWordIndex++;
-                    } else {
-                        pauseReading();
-                        pauseTimer();
-                        displayArea.innerHTML = '<span class="text-success">เสร็จสิ้น! 🎉</span>';
-                    }
-                }, interval);
-            }
-            function pauseReading() {
-                clearInterval(timerId);
-                isPlaying = false;
-            }
-            // Reset reading and progress display
-            function resetReading() {
-                pauseReading();
-                currentWordIndex = 0;
-                updateProgress();
-                displayArea.textContent = "คำจะแสดงที่นี่";
-            }
+    displayWord(word) {
+        if (!word) {
+            this.displayArea.textContent = "";
+            return;
+        }
+        const orp = Math.max(1, Math.floor(word.length / 3));
+        const pre = word.substring(0, orp);
+        const highlight = word.substring(orp, orp + 1);
+        const post = word.substring(orp + 1);
+        this.displayArea.innerHTML = pre + '<span class="highlight">' + highlight + '</span>' + post;
+    }
 
-            // ---------------------------
-            // TIMER FUNCTIONS
-            // ---------------------------
-            function startTimer() {
-                timerElement.classList.remove('d-none');
-                if (!startTime) startTime = Date.now() - elapsedTime;
-                timerInterval = setInterval(updateTimer, 1000);
-            }
-            function pauseTimer() {
-                clearInterval(timerInterval);
-                elapsedTime = Date.now() - startTime;
-            }
-            function resetTimer() {
-                clearInterval(timerInterval);
-                timerElement.textContent = "00:00";
-                timerElement.classList.add('d-none');
-                startTime = null;
-                elapsedTime = 0;
-            }
-            function updateTimer() {
-                elapsedTime = Date.now() - startTime;
-                const minutes = Math.floor(elapsedTime / 60000);
-                const seconds = Math.floor((elapsedTime % 60000) / 1000);
-                timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-            }
+    showFinish() {
+        this.displayArea.innerHTML = '<span class="text-success">เสร็จสิ้น! 🎉</span>';
+    }
 
-            // ---------------------------
-            // EVENT LISTENERS
-            // ---------------------------
-            // Update speed value and restart reading if playing
-            speedSlider.addEventListener('input', function () {
-                speedValue.textContent = speedSlider.value;
-                if (isPlaying) {
-                    pauseReading();
-                    startReading();
-                }
-            });
-            // Start reading with timer and navbar animation
-            startButton.addEventListener('click', function () {
-                if (!isPlaying) {
-                    startReading();
-                    startTimer();
-                    navbar.classList.add('navbar-reading');
-                }
-            });
-            // Pause reading and timer
-            pauseButton.addEventListener('click', function () {
-                if (isPlaying) {
-                    pauseReading();
-                    pauseTimer();
-                    navbar.classList.remove('navbar-reading');
-                }
-            });
-            // Reset reading and timer; remove reading animation class
-            resetButton.addEventListener('click', function () {
-                resetReading();
-                resetTimer();
-                navbar.classList.remove('navbar-reading');
-            });
-            // Process text on input change
-            textInput.addEventListener('input', function () {
-                resetReading();
-                resetTimer();
-                processText();
-                updateWordCount();
-            });
+    resetDisplay() {
+        this.displayArea.textContent = "คำจะแสดงที่นี่";
+    }
 
-            // Initialize text processing on page load
-            processText();
-            updateWordCount();
-        });
+    setSpeedValue(val) {
+        this.speedValue.textContent = val;
+    }
+
+    showTimer() {
+        this.timerElement.classList.remove('d-none');
+    }
+
+    hideTimer() {
+        this.timerElement.classList.add('d-none');
+        this.timerElement.textContent = "00:00";
+    }
+
+    updateTimer(minutes, seconds) {
+        this.timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
+
+    setNavbarReading(isReading) {
+        if (isReading) this.navbar.classList.add('navbar-reading');
+        else this.navbar.classList.remove('navbar-reading');
+    }
+}
     </script>
 </body>
 

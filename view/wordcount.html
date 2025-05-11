@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="th" data-bs-theme="auto">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เครื่องนับคำและตัวอักษร | Word Counter</title>
+    <!-- Bootstrap CSS and Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        /* Root variable definitions for transitions and layout */
+        :root {
+            --transition-speed: 0.3s;
+            --card-border-radius: 16px;
+            --btn-border-radius: 50px;
+            --textarea-border-radius: 12px;
+            --primary-gradient: linear-gradient(135deg, var(--bs-primary), #6a11cb);
+            --card-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+        
+        /* Base styles for the body and container */
+        body {
+            padding: 2rem 1rem;
+            transition: background-color var(--transition-speed), color var(--transition-speed);
+            min-height: 100vh;
+            background-image: radial-gradient(circle at top right, rgba(var(--bs-primary-rgb), 0.1), transparent 60%);
+            background-attachment: fixed;
+        }
+        
+        /* Adjust background image when dark theme is active */
+        [data-bs-theme="dark"] body {
+            background-image: radial-gradient(circle at top right, rgba(var(--bs-primary-rgb), 0.15), transparent 60%);
+        }
+        
+        .app-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            border-radius: 24px;
+            background-color: rgba(var(--bs-body-bg-rgb), 0.8);
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--card-shadow);
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+        
+        @keyframes fadeIn {
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Title and Subtitle styling */
+        .app-title {
+            font-weight: 800;
+            font-size: 2.8rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-align: center;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.5px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            color: var(--bs-secondary);
+            font-weight: 500;
+        }
+        
+        /* Textarea style for input */
+        #textInput {
+            min-height: 260px;
+            resize: vertical;
+            border-radius: var(--textarea-border-radius);
+            font-size: 1.1rem;
+            padding: 1.25rem;
+            border: 1px solid var(--bs-border-color-translucent);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        #textInput:focus {
+            box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
+            border-color: rgba(var(--bs-primary-rgb), 0.5);
+        }
+        
+        /* Action buttons style */
+        .action-btn {
+            border-radius: var(--btn-border-radius);
+            padding: 0.6rem 1.2rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .action-btn:hover { transform: translateY(-3px); box-shadow: 0 6px 15px rgba(0,0,0,0.15); }
+        .action-btn:active { transform: translateY(-1px); }
+        
+        /* Grid container for text stats */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1.25rem;
+            margin-top: 2.5rem;
+        }
+        
+        /* Styling for each counter card */
+        .counter-card {
+            border-radius: var(--card-border-radius);
+            padding: 1.5rem 1rem;
+            text-align: center;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+            border: none;
+            position: relative;
+            overflow: hidden;
+        }
+        .counter-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--primary-gradient);
+            opacity: 0.7;
+        }
+        .counter-card:hover { transform: translateY(-7px); box-shadow: 0 12px 25px rgba(0,0,0,0.15); }
+        
+        .counter-label {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.85;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        .counter-value {
+            font-weight: 800;
+            font-size: 2.2rem;
+            line-height: 1.2;
+        }
+        .counter-value.updated {
+            animation: pulse 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.08); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        /* Save status indicator */
+        #saveStatus {
+            transition: all 0.5s ease;
+            background-color: rgba(var(--bs-success-rgb), 0.1);
+            color: var(--bs-success);
+            border-radius: 50px;
+            padding: 0.4rem 1rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        #saveStatus.saving { background-color: rgba(var(--bs-warning-rgb), 0.1); color: var(--bs-warning); }
+        #saveStatus.error { background-color: rgba(var(--bs-danger-rgb), 0.1); color: var(--bs-danger); }
+        
+        /* Theme toggle button styling */
+        .theme-toggle {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transition: all 0.3s ease;
+            z-index: 100;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+        }
+        .theme-toggle:hover { transform: scale(1.1) rotate(10deg); box-shadow: 0 6px 16px rgba(0,0,0,0.2); }
+        
+        /* Footer style */
+        .footer {
+            text-align: center;
+            margin-top: 3rem;
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+        
+        /* Auto-save settings styling */
+        .auto-save-settings {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-top: 1rem;
+            padding: 0.75rem 1rem;
+            border-radius: var(--card-border-radius);
+            background-color: rgba(var(--bs-light-rgb), 0.6);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        [data-bs-theme="dark"] .auto-save-settings { background-color: rgba(var(--bs-dark-rgb), 0.4); }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .app-container { padding: 1.5rem 1rem; border-radius: 16px; }
+            .app-title { font-size: 2.2rem; }
+            .counter-value { font-size: 1.8rem; }
+            .stats-container { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem; }
+            .auto-save-settings { flex-direction: column; align-items: flex-start; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Theme toggle button -->
+    <button id="themeToggleBtn" class="btn theme-toggle" title="สลับธีม">
+        <i id="themeIcon" class="bi bi-circle-half"></i>
+    </button>
+    
+    <!-- Main container for the word counter tool -->
+    <div class="app-container">
+        <h1 class="app-title">เครื่องนับคำและตัวอักษร</h1>
+        <p class="subtitle">นับสถิติข้อความของคุณแบบเรียลไทม์ พร้อมข้อมูลเชิงลึก</p>
+
+        <!-- Tool Section: Input textarea and action buttons -->
+        <div class="tool-section">
+            <div class="section-title">
+                <i class="bi bi-pencil-square text-primary me-2"></i>
+                <span>ข้อความของคุณ</span>
+            </div>
+            <textarea id="textInput" class="form-control shadow-sm" placeholder="วางหรือพิมพ์ข้อความของคุณที่นี่..."></textarea>
+            
+            <div class="d-flex justify-content-between align-items-center flex-wrap mt-3">
+                <div class="btn-group-actions">
+                    <button id="clearBtn" class="btn btn-outline-secondary action-btn">
+                        <i class="bi bi-trash me-1"></i>ล้าง
+                    </button>
+                    <button id="copyBtn" class="btn btn-outline-primary action-btn">
+                        <i class="bi bi-clipboard me-1"></i>คัดลอก
+                    </button>
+                    <button id="shareBtn" class="btn btn-outline-success action-btn">
+                        <i class="bi bi-share me-1"></i>แชร์
+                    </button>
+                    <button id="printBtn" class="btn btn-outline-info action-btn">
+                        <i class="bi bi-printer me-1"></i>พิมพ์
+                    </button>
+                    <a href="speedread.html" id="speedReadBtn" class="btn btn-outline-warning action-btn">
+                        <i class="bi bi-lightning-charge me-1"></i>ไปหน้า Speed Read
+                    </a>
+                </div>
+                <!-- Save Status -->
+                <span id="saveStatus" class="opacity-0">
+                    <div class="save-indicator"><i class="bi bi-check-circle-fill"></i></div>
+                    บันทึกอัตโนมัติแล้ว
+                </span>
+            </div>
+            
+            <!-- Auto-save settings -->
+            <div class="auto-save-settings">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="autoSaveToggle" checked>
+                    <label class="form-check-label" for="autoSaveToggle">บันทึกอัตโนมัติ</label>
+                </div>
+                <div class="input-group" style="width: auto;">
+                    <label class="input-group-text" for="autoSaveInterval">บันทึกทุกๆ</label>
+                    <select class="form-select" id="autoSaveInterval">
+                        <option value="500">0.5 วินาที</option>
+                        <option value="1000">1 วินาที</option>
+                        <option value="2000" selected>2 วินาที</option>
+                        <option value="5000">5 วินาที</option>
+                        <option value="10000">10 วินาที</option>
+                    </select>
+                </div>
+                <button id="manualSaveBtn" class="btn btn-primary btn-sm action-btn">
+                    <i class="bi bi-save me-1"></i>บันทึกตอนนี้
+                </button>
+            </div>
+        </div>
+
+        <!-- Statistics Display -->
+        <div class="stats-container">
+            <div class="counter-card bg-primary-subtle text-primary-emphasis">
+                <div class="counter-label">ตัวอักษร</div>
+                <div id="charCount" class="counter-value">0</div>
+            </div>
+            <div class="counter-card bg-info-subtle text-info-emphasis">
+                <div class="counter-label">ไม่รวมช่องว่าง</div>
+                <div id="charNoSpaceCount" class="counter-value">0</div>
+            </div>
+            <div class="counter-card bg-success-subtle text-success-emphasis">
+                <div class="counter-label">คำ</div>
+                <div id="wordCount" class="counter-value">0</div>
+            </div>
+            <div class="counter-card bg-warning-subtle text-warning-emphasis">
+                <div class="counter-label">บรรทัด</div>
+                <div id="lineCount" class="counter-value">0</div>
+            </div>
+            <div class="counter-card bg-secondary-subtle text-secondary-emphasis">
+                <div class="counter-label">ประโยค</div>
+                <div id="sentenceCount" class="counter-value">0</div>
+            </div>
+            <div class="counter-card bg-light-subtle text-dark-emphasis">
+                <div class="counter-label">ย่อหน้า</div>
+                <div id="paragraphCount" class="counter-value">0</div>
+            </div>
+            <div class="counter-card bg-danger-subtle text-danger-emphasis">
+                <div class="counter-label">คำไม่ซ้ำ</div>
+                <div id="uniqueWordCount" class="counter-value">0</div>
+            </div>
+            <div class="counter-card bg-info-subtle text-info-emphasis">
+                <div class="counter-label">ยาวเฉลี่ย/คำ</div>
+                <div id="avgWordLength" class="counter-value">0</div>
+            </div>
+            <div class="counter-card bg-success-subtle text-success-emphasis">
+                <div class="counter-label">เวลาอ่าน<br><small>(นาที)</small></div>
+                <div id="readTime" class="counter-value">0</div>
+            </div>
+            <div class="counter-card bg-warning-subtle text-warning-emphasis">
+                <div class="counter-label">เวลาอ่าน<br><small>(วินาที)</small></div>
+                <div id="readTimeSec" class="counter-value">0</div>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <p>© 2025 Word Counter</p>
+        </div>
+    </div>
+
+    <!-- Bootstrap Bundle JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../model/wordcount.model.js"></script>
+    <script>
+    // WordCountView (ยุบมาในไฟล์นี้)
+    class WordCountView {
+        constructor() {
+            this.textInput = document.getElementById('textInput');
+            this.charCount = document.getElementById('charCount');
+            this.charNoSpaceCount = document.getElementById('charNoSpaceCount');
+            this.wordCount = document.getElementById('wordCount');
+            this.lineCount = document.getElementById('lineCount');
+            this.sentenceCount = document.getElementById('sentenceCount');
+            this.paragraphCount = document.getElementById('paragraphCount');
+            this.uniqueWordCount = document.getElementById('uniqueWordCount');
+            this.avgWordLength = document.getElementById('avgWordLength');
+            this.readTime = document.getElementById('readTime');
+            this.readTimeSec = document.getElementById('readTimeSec');
+            this.saveStatus = document.getElementById('saveStatus');
+            this.themeToggleBtn = document.getElementById('themeToggleBtn');
+            this.themeIcon = document.getElementById('themeIcon');
+            this.clearBtn = document.getElementById('clearBtn');
+            this.copyBtn = document.getElementById('copyBtn');
+            this.shareBtn = document.getElementById('shareBtn');
+            this.printBtn = document.getElementById('printBtn');
+            this.autoSaveToggle = document.getElementById('autoSaveToggle');
+            this.autoSaveInterval = document.getElementById('autoSaveInterval');
+            this.manualSaveBtn = document.getElementById('manualSaveBtn');
+            this.htmlEl = document.documentElement;
+        }
+
+        updateStats(stats) {
+            this.charCount.textContent = stats.chars.toLocaleString();
+            this.charNoSpaceCount.textContent = stats.noSpaces.toLocaleString();
+            this.wordCount.textContent = stats.words.toLocaleString();
+            this.lineCount.textContent = stats.lines.toLocaleString();
+            this.sentenceCount.textContent = stats.sentences.toLocaleString();
+            this.paragraphCount.textContent = stats.paras.toLocaleString();
+            this.uniqueWordCount.textContent = stats.unique.toLocaleString();
+            this.avgWordLength.textContent = stats.avgLen.toFixed(2);
+            this.readTime.textContent = stats.minutes.toFixed(2);
+            this.readTimeSec.textContent = Math.ceil(stats.seconds).toLocaleString();
+        }
+
+        animate(el) {
+            el.classList.add('updated');
+            el.addEventListener('animationend', () => el.classList.remove('updated'), { once: true });
+        }
+
+        updateSaveStatus(status, message, timeout = 2000) {
+            const indicator = this.saveStatus.querySelector('.save-indicator');
+            this.saveStatus.className = status;
+            this.saveStatus.classList.remove('opacity-0');
+            if (status === 'saving') {
+                indicator.innerHTML = '<div class="save-spinner"></div>';
+                this.saveStatus.innerHTML = this.saveStatus.innerHTML.replace(/(บันทึกอัตโนมัติแล้ว|กำลังบันทึก\.\.\.|บันทึกไม่สำเร็จ)/g, 'กำลังบันทึก...');
+            } else if (status === 'error') {
+                indicator.innerHTML = '<i class="bi bi-exclamation-circle-fill"></i>';
+                this.saveStatus.innerHTML = this.saveStatus.innerHTML.replace(/(บันทึกอัตโนมัติแล้ว|กำลังบันทึก\.\.\.|บันทึกไม่สำเร็จ)/g, 'บันทึกไม่สำเร็จ');
+            } else {
+                indicator.innerHTML = '<i class="bi bi-check-circle-fill"></i>';
+                this.saveStatus.innerHTML = this.saveStatus.innerHTML.replace(/(บันทึกอัตโนมัติแล้ว|กำลังบันทึก\.\.\.|บันทึกไม่สำเร็จ)/g, 'บันทึกอัตโนมัติแล้ว');
+            }
+            if (message) {
+                this.saveStatus.innerHTML = this.saveStatus.innerHTML.replace(/(บันทึกอัตโนมัติแล้ว|กำลังบันทึก\.\.\.|บันทึกไม่สำเร็จ)/g, message);
+            }
+            clearTimeout(this.saveStatus.timeoutId);
+            if (timeout) {
+                this.saveStatus.timeoutId = setTimeout(() => { this.saveStatus.classList.add('opacity-0'); }, timeout);
+            }
+        }
+    }
+    </script>
+    <script src="../controller/wordcount.controller.js"></script>
+</body>
+</html>
