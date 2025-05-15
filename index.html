@@ -164,7 +164,7 @@
                 clockElement.textContent = new Date().toLocaleTimeString('th-TH', { hour12: false }); // แสดงเวลาในรูปแบบ 24 ชม.
             }
         }
-        setInterval(updateClock, 1000); // อัปเดตทุก 1 วินาที
+        setInterval(updateClock, 0); // อัปเดตทุก 1 วินาที
         updateClock(); // เรียกครั้งแรกทันที
 
         // อัปเดตปีปัจจุบันใน Footer
