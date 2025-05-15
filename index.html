@@ -1,10 +1,237 @@
 <!DOCTYPE html>
-<html lang="th">
-  <head>
-    <meta http-equiv="refresh" content="0; url=view/wordcount.html">
-    <title>Redirecting...</title>
-  </head>
-  <body>
-    <p>กำลังเปลี่ยนเส้นทางไปยัง <a href="view/wordcount.html">Word Counter</a>...</p>
-  </body>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE Facility</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .glass-effect {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-800 min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+    <!-- Background Elements -->
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+        <div class="bubble w-32 h-32 bg-white/10 rounded-full absolute top-1/4 left-1/4 animate-float"></div>
+        <div class="bubble w-24 h-24 bg-white/10 rounded-full absolute top-3/4 left-1/3 animate-float" style="animation-delay: 1s;"></div>
+        <div class="bubble w-40 h-40 bg-white/10 rounded-full absolute top-1/3 right-1/4 animate-float" style="animation-delay: 2s;"></div>
+        <div class="bubble w-20 h-20 bg-white/10 rounded-full absolute bottom-1/4 right-1/3 animate-float" style="animation-delay: 3s;"></div>
+    </div>
+
+    <!-- Main Container -->
+    <main class="container mx-auto z-10">
+        <!-- Card Container -->
+        <div class="main-card bg-white/90 backdrop-blur-lg rounded-2xl shadow-2xl p-10 max-w-2xl mx-auto transform hover:scale-102 transition-transform duration-300 border border-white/20">
+            <!-- Logo -->
+            <div class="flex justify-center mb-6">
+                <div class="w-16 h-16 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center shadow-lg mb-4">
+                    <span class="text-white text-2xl font-bold">F</span>
+                </div>
+            </div>
+            
+            <!-- Title -->
+            <h1 class="text-5xl font-bold text-center mb-4 text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
+                THE Facility
+            </h1>
+            
+            <p class="text-gray-600 text-center mb-10">Analyze your text with our powerful tools</p>
+            
+            <!-- Navigation Grid -->
+            <nav class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <a href="view/wordcount.html"
+                   class="nav-btn group relative bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white font-bold py-6 px-6 rounded-xl transition-all duration-300 text-center transform hover:-translate-y-1 shadow-lg overflow-hidden">
+                    <div class="relative z-10">
+                        <div class="flex flex-col items-center">
+                            <span class="text-4xl mb-3">📝</span>
+                            <span class="text-xl">Word Counter</span>
+                        </div>
+                        <p class="text-blue-100 text-sm mt-3 opacity-80">Count words, characters, and analyze your text</p>
+                    </div>
+                    <div class="absolute inset-0 bg-white/10 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-500"></div>
+                </a>
+                <a href="view/speedread.html"
+                   class="nav-btn group relative bg-gradient-to-r from-purple-500 to-purple-700 hover:from-purple-600 hover:to-purple-800 text-white font-bold py-6 px-6 rounded-xl transition-all duration-300 text-center transform hover:-translate-y-1 shadow-lg overflow-hidden">
+                    <div class="relative z-10">
+                        <div class="flex flex-col items-center">
+                            <span class="text-4xl mb-3">🚀</span>
+                            <span class="text-xl">Speed Reader</span>
+                        </div>
+                        <p class="text-purple-100 text-sm mt-3 opacity-80">Improve your reading speed and comprehension</p>
+                    </div>
+                    <div class="absolute inset-0 bg-white/10 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-500"></div>
+                </a>
+            </nav>
+            
+            <!-- Footer -->
+            <div class="mt-12 text-center text-gray-500 text-sm">
+                <p>© 2025 Word Counter App</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check if GSAP loaded successfully
+            if (typeof gsap === 'undefined') {
+                console.error('GSAP not loaded. Skipping animations.');
+                // Fallback: show elements without animation
+                const mainCard = document.querySelector('.main-card');
+                const navButtons = document.querySelectorAll('.nav-btn');
+                const bubbles = document.querySelectorAll('.bubble');
+                if (mainCard) mainCard.style.opacity = '1';
+                navButtons.forEach(btn => btn.style.opacity = '1');
+                bubbles.forEach(bubble => bubble.style.opacity = '1');
+                return;
+            }
+
+            try {
+                // Create GSAP timeline
+                const tl = gsap.timeline({
+                    defaults: {
+                        ease: 'power3.out',
+                        duration: 0.8
+                    }
+                });
+
+                // Background bubbles animation
+                const bubbles = document.querySelectorAll('.bubble');
+                if (bubbles.length > 0) {
+                    tl.fromTo(bubbles, 
+                        { opacity: 0, scale: 0.5 },
+                        { 
+                            opacity: 0.7, 
+                            scale: 1, 
+                            stagger: 0.2, 
+                            duration: 1.5, 
+                            ease: 'elastic.out(1, 0.5)' 
+                        }
+                    );
+                }
+
+                // Main card animation
+                const mainCard = document.querySelector('.main-card');
+                if (mainCard) {
+                    tl.fromTo(mainCard, 
+                        { opacity: 0, y: 50, scale: 0.9 },
+                        { opacity: 1, y: 0, scale: 1, duration: 1, ease: 'back.out(1.7)' },
+                        '-=0.5'
+                    );
+                } else {
+                    console.warn('Main card element not found.');
+                }
+
+                // Logo animation
+                const logo = document.querySelector('.main-card div:first-child');
+                if (logo) {
+                    tl.fromTo(logo,
+                        { opacity: 0, rotate: -180, scale: 0 },
+                        { opacity: 1, rotate: 0, scale: 1, duration: 1, ease: 'back.out(2)' },
+                        '-=0.7'
+                    );
+                }
+
+                // Title animation
+                const title = document.querySelector('h1');
+                if (title) {
+                    tl.fromTo(title,
+                        { opacity: 0, y: 20 },
+                        { opacity: 1, y: 0, duration: 0.8 },
+                        '-=0.5'
+                    );
+                }
+
+                // Subtitle animation
+                const subtitle = document.querySelector('p.text-gray-600');
+                if (subtitle) {
+                    tl.fromTo(subtitle,
+                        { opacity: 0, y: 20 },
+                        { opacity: 1, y: 0, duration: 0.8 },
+                        '-=0.6'
+                    );
+                }
+
+                // Staggered button animations
+                const navButtons = document.querySelectorAll('.nav-btn');
+                if (navButtons.length > 0) {
+                    tl.fromTo(navButtons, 
+                        { opacity: 0, y: 30 },
+                        { 
+                            opacity: 1, 
+                            y: 0, 
+                            stagger: 0.2, 
+                            duration: 0.8, 
+                            ease: 'back.out(1.7)',
+                            clearProps: 'all' 
+                        }, 
+                        '-=0.4'
+                    );
+                } else {
+                    console.warn('Nav buttons not found.');
+                }
+
+                // Footer animation
+                const footer = document.querySelector('.mt-12');
+                if (footer) {
+                    tl.fromTo(footer,
+                        { opacity: 0 },
+                        { opacity: 1, duration: 0.8 },
+                        '-=0.2'
+                    );
+                }
+
+                // Check animation status after completion
+                tl.eventCallback('onComplete', () => {
+                    console.log('All animations completed successfully');
+                });
+
+            } catch (error) {
+                console.error('Animation error:', error);
+                // Fallback: show elements without animation
+                const mainCard = document.querySelector('.main-card');
+                const navButtons = document.querySelectorAll('.nav-btn');
+                const bubbles = document.querySelectorAll('.bubble');
+                if (mainCard) mainCard.style.opacity = '1';
+                navButtons.forEach(btn => btn.style.opacity = '1');
+                bubbles.forEach(bubble => bubble.style.opacity = '1');
+            }
+            
+            // Add mouse parallax effect to bubbles
+            document.addEventListener('mousemove', (e) => {
+                const bubbles = document.querySelectorAll('.bubble');
+                const mouseX = e.clientX / window.innerWidth - 0.5;
+                const mouseY = e.clientY / window.innerHeight - 0.5;
+                
+                bubbles.forEach((bubble, index) => {
+                    const speed = 0.05 * (index + 1);
+                    gsap.to(bubble, {
+                        x: mouseX * 100 * speed,
+                        y: mouseY * 100 * speed,
+                        duration: 1
+                    });
+                });
+            });
+        });
+    </script>
+</body>
 </html>
