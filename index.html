@@ -1,236 +1,255 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="th">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>THE Facility</title>
+    <title>THE Facility - Text Analysis Tools</title>
+    <!-- รวม Tailwind CSS ผ่าน CDN เพื่อใช้งาน utility classes -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- รวม GSAP ผ่าน CDN เพื่อสร้าง animation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <!-- รวมฟอนต์ Poppins จาก Google Fonts เพื่อใช้ในหน้าเว็บ -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- การกำหนดค่า Tailwind CSS แบบ custom -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cyan: {
+                            400: '#22d3ee', // สีฟ้าอ่อน
+                            500: '#06b6d4', // สีฟ้าปานกลาง
+                            600: '#0891b2', // สีฟ้าเข้ม
+                        },
+                        magenta: {
+                            400: '#f472b6', // สีชมพูอ่อน
+                            500: '#ec4899', // สีชมพูปานกลาง
+                            600: '#db2777', // สีชมพูเข้ม
+                        },
+                        yellow: {
+                            400: '#facc15', // สีเหลืองอ่อน
+                            500: '#eab308', // สีเหลืองปานกลาง
+                            600: '#ca8a04', // สีเหลืองเข้ม
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Custom CSS Styles -->
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-        
+        /* กำหนดสไตล์พื้นฐานให้ body */
         body {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Poppins', sans-serif; /* ใช้ฟอนต์ Poppins */
+            background: linear-gradient(135deg, #1a1c4b, #4b1945, #4b1c1c); /* พื้นหลังแบบ gradient */
+            background-size: 400% 400%; /* ขยายขนาดพื้นหลังเพื่อให้ animation ลื่นไหล */
+            animation: gradientBG 15s ease infinite; /* เรียก animation gradientBG */
+            min-height: 100vh; /* ให้ความสูงครอบคลุมหน้าจอ */
+            color: white; /* สีข้อความเป็นสีขาว */
+            overflow-x: hidden; /* ป้องกัน scrollbar แนวนอนจากการล้นของ animation */
         }
-        
-        .glass-effect {
-            backdrop-filter: blur(10px);
-            background: rgba(255, 255, 255, 0.1);
+
+        /* Keyframe สำหรับ animation ของพื้นหลัง gradient */
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; } /* ตำแหน่งเริ่มต้น */
+            50% { background-position: 100% 50%; } /* ตำแหน่งกลาง */
+            100% { background-position: 0% 50%; } /* กลับสู่ตำแหน่งเริ่มต้น */
         }
-        
-        .animate-float {
-            animation: float 6s ease-in-out infinite;
+
+        /* สไตล์สำหรับ glass card effect */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05); /* พื้นหลังโปร่งใสเล็กน้อย */
+            backdrop-filter: blur(12px); /* เอฟเฟกต์เบลอด้านหลังแบบกระจก */
+            border: 1px solid rgba(255, 255, 255, 0.1); /* ขอบสีขาวโปร่งใส */
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37); /* เงาให้ความลึก */
+            transition: background-color 0.3s ease; /* การเปลี่ยนสีพื้นหลังเมื่อ hover */
         }
-        
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
-            100% { transform: translateY(0px); }
+
+        /* Hover effect สำหรับ glass card */
+        .glass-card:hover {
+            background: rgba(255, 255, 255, 0.1); /* เปลี่ยนสีพื้นหลังให้สว่างขึ้นเมื่อ hover */
+        }
+
+        /* สไตล์สำหรับข้อความ gradient */
+        .text-gradient {
+            background: linear-gradient(45deg, #00ffff, #ff00ff, #ffff00); /* gradient สีฟ้า-ชมพู-เหลือง */
+            -webkit-background-clip: text; /* ตัดสีพื้นหลังให้ติดกับข้อความ (สำหรับ Webkit) */
+            background-clip: text; /* ตัดสีพื้นหลังให้ติดกับข้อความ */
+            color: transparent; /* ทำให้ข้อความโปร่งใสเพื่อให้เห็น gradient */
+            background-size: 300% 300%; /* ขยายขนาด gradient เพื่อให้ GSAP ควบคุม animation */
         }
     </style>
 </head>
-<body class="bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-800 min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
-    <!-- Background Elements -->
-    <div class="absolute inset-0 overflow-hidden pointer-events-none">
-        <div class="bubble w-32 h-32 bg-white/10 rounded-full absolute top-1/4 left-1/4 animate-float"></div>
-        <div class="bubble w-24 h-24 bg-white/10 rounded-full absolute top-3/4 left-1/3 animate-float" style="animation-delay: 1s;"></div>
-        <div class="bubble w-40 h-40 bg-white/10 rounded-full absolute top-1/3 right-1/4 animate-float" style="animation-delay: 2s;"></div>
-        <div class="bubble w-20 h-20 bg-white/10 rounded-full absolute bottom-1/4 right-1/3 animate-float" style="animation-delay: 3s;"></div>
-    </div>
+<body class="bg-slate-900"> 
+    <div class="min-h-screen">
+        <!-- Navbar ด้วย glass effect -->
+        <nav class="glass-card fixed top-0 w-full z-50 px-6 py-4">
+            <div class="container mx-auto flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <!-- โลโก้แบบวงกลมพร้อม gradient -->
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-r from-cyan-400 to-magenta-400 flex items-center justify-center">
+                        <span class="text-white text-xl font-bold">F</span> <!-- ตัวอักษร F ในโลโก้ -->
+                    </div>
+                    <!-- ชื่อเว็บด้วยข้อความ gradient -->
+                    <span class="text-2xl font-bold text-gradient">THE Facility</span>
+                </div>
+                <!-- นาฬิกาแสดงเวลา -->
+                <div id="clock" class="text-white text-lg"></div>
+            </div>
+        </nav>
 
-    <!-- Main Container -->
-    <main class="container mx-auto z-10">
-        <!-- Card Container -->
-        <div class="main-card bg-white/90 backdrop-blur-lg rounded-2xl shadow-2xl p-10 max-w-2xl mx-auto transform hover:scale-102 transition-transform duration-300 border border-white/20">
-            <!-- Logo -->
-            <div class="flex justify-center mb-6">
-                <div class="w-16 h-16 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center shadow-lg mb-4">
-                    <span class="text-white text-2xl font-bold">F</span>
+        <!-- ส่วนเนื้อหาหลัก -->
+        <main class="container mx-auto pt-24 sm:pt-28 md:pt-32 px-4"> 
+            <div class="glass-card rounded-3xl p-6 sm:p-8 max-w-4xl mx-auto">
+                <!-- หัวข้อหลักด้วยข้อความ gradient -->
+                <h1 class="text-4xl sm:text-5xl font-bold text-center mb-8 text-gradient">
+                    Text Analysis Tools
+                </h1>
+
+                <!-- Grid สำหรับการ์ดเครื่องมือ -->
+                <div class="grid md:grid-cols-2 gap-6 sm:gap-8 mb-16 sm:mb-20"> 
+                    <!-- การ์ด Word Counter -->
+                    <a href="view/wordcount.html" class="glass-card rounded-xl p-6 transition-transform">
+                        <div class="text-4xl mb-4 emoji-float">📝</div> <!-- อิโมจิที่ลอยได้ -->
+                        <h3 class="text-xl sm:text-2xl font-bold mb-2">Word Counter</h3>
+                        <p class="text-gray-200 text-sm sm:text-base">Count words, characters, and analyze your text</p>
+                    </a>
+                    
+                    <!-- การ์ด Speed Reader -->
+                    <a href="view/speedread.html" class="glass-card rounded-xl p-6 transition-transform">
+                        <div class="text-4xl mb-4 emoji-float">🚀</div> <!-- อิโมจิที่ลอยได้ -->
+                        <h3 class="text-xl sm:text-2xl font-bold mb-2">Speed Reader</h3>
+                        <p class="text-gray-200 text-sm sm:text-base">Improve your reading speed</p>
+                    </a>
+                </div>
+
+                <!-- Grid สำหรับคุณสมบัติเด่น -->
+                <div class="grid md:grid-cols-3 gap-6">
+                    <!-- คุณสมบัติ Detailed Analysis -->
+                    <div class="glass-card rounded-xl p-6">
+                        <div class="text-3xl mb-3 emoji-float">📊</div> <!-- อิโมจิที่ลอยได้ -->
+                        <h3 class="text-lg sm:text-xl font-bold mb-2">Detailed Analysis</h3>
+                        <p class="text-gray-200 text-xs sm:text-sm">Comprehensive text insights</p>
+                    </div>
+                    <!-- คุณสมบัติ Time Saving -->
+                    <div class="glass-card rounded-xl p-6">
+                        <div class="text-3xl mb-3 emoji-float">⏱️</div> <!-- อิโมจิที่ลอยได้ -->
+                        <h3 class="text-lg sm:text-xl font-bold mb-2">Time Saving</h3>
+                        <p class="text-gray-200 text-xs sm:text-sm">Efficient text processing</p>
+                    </div>
+                    <!-- คุณสมบัติ Privacy First -->
+                    <div class="glass-card rounded-xl p-6">
+                        <div class="text-3xl mb-3 emoji-float">🔒</div> <!-- อิโมจิที่ลอยได้ -->
+                        <h3 class="text-lg sm:text-xl font-bold mb-2">Privacy First</h3>
+                        <p class="text-gray-200 text-xs sm:text-sm">Local processing only</p>
+                    </div>
                 </div>
             </div>
-            
-            <!-- Title -->
-            <h1 class="text-5xl font-bold text-center mb-4 text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
-                THE Facility
-            </h1>
-            
-            <p class="text-gray-600 text-center mb-10">Analyze your text with our powerful tools</p>
-            
-            <!-- Navigation Grid -->
-            <nav class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <a href="view/wordcount.html"
-                   class="nav-btn group relative bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white font-bold py-6 px-6 rounded-xl transition-all duration-300 text-center transform hover:-translate-y-1 shadow-lg overflow-hidden">
-                    <div class="relative z-10">
-                        <div class="flex flex-col items-center">
-                            <span class="text-4xl mb-3">📝</span>
-                            <span class="text-xl">Word Counter</span>
-                        </div>
-                        <p class="text-blue-100 text-sm mt-3 opacity-80">Count words, characters, and analyze your text</p>
-                    </div>
-                    <div class="absolute inset-0 bg-white/10 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-500"></div>
-                </a>
-                <a href="view/speedread.html"
-                   class="nav-btn group relative bg-gradient-to-r from-purple-500 to-purple-700 hover:from-purple-600 hover:to-purple-800 text-white font-bold py-6 px-6 rounded-xl transition-all duration-300 text-center transform hover:-translate-y-1 shadow-lg overflow-hidden">
-                    <div class="relative z-10">
-                        <div class="flex flex-col items-center">
-                            <span class="text-4xl mb-3">🚀</span>
-                            <span class="text-xl">Speed Reader</span>
-                        </div>
-                        <p class="text-purple-100 text-sm mt-3 opacity-80">Improve your reading speed and comprehension</p>
-                    </div>
-                    <div class="absolute inset-0 bg-white/10 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-500"></div>
-                </a>
-            </nav>
-            
-            <!-- Footer -->
-            <div class="mt-12 text-center text-gray-500 text-sm">
-                <p>© 2025 Word Counter App</p>
-            </div>
-        </div>
-    </main>
+        </main>
 
-    <!-- Scripts -->
+        <!-- Footer -->
+        <footer class="container mx-auto py-8 text-center text-white/70">
+            <p>© <span id="currentYear">2025</span> THE Facility. All rights reserved.</p> <!-- ปีอัปเดตอัตโนมัติ -->
+        </footer>
+    </div>
+
+    <!-- JavaScript -->
     <script>
+        // ฟังก์ชันอัปเดตนาฬิกาทุกวินาที
+        function updateClock() {
+            const clockElement = document.getElementById('clock');
+            if (clockElement) { 
+                clockElement.textContent = new Date().toLocaleTimeString('th-TH', { hour12: false }); // แสดงเวลาในรูปแบบ 24 ชม.
+            }
+        }
+        setInterval(updateClock, 1000); // อัปเดตทุก 1 วินาที
+        updateClock(); // เรียกครั้งแรกทันที
+
+        // อัปเดตปีปัจจุบันใน Footer
+        const currentYearElement = document.getElementById('currentYear');
+        if (currentYearElement) {
+            currentYearElement.textContent = new Date().getFullYear(); // แสดงปีปัจจุบัน
+        }
+
+        // GSAP Animations
         document.addEventListener('DOMContentLoaded', () => {
-            // Check if GSAP loaded successfully
-            if (typeof gsap === 'undefined') {
-                console.error('GSAP not loaded. Skipping animations.');
-                // Fallback: show elements without animation
-                const mainCard = document.querySelector('.main-card');
-                const navButtons = document.querySelectorAll('.nav-btn');
-                const bubbles = document.querySelectorAll('.bubble');
-                if (mainCard) mainCard.style.opacity = '1';
-                navButtons.forEach(btn => btn.style.opacity = '1');
-                bubbles.forEach(bubble => bubble.style.opacity = '1');
-                return;
-            }
+            const tl = gsap.timeline({
+                defaults: {
+                    ease: "power3.out" // easing แบบนุ่มนวล
+                }
+            });
 
-            try {
-                // Create GSAP timeline
-                const tl = gsap.timeline({
-                    defaults: {
-                        ease: 'power3.out',
-                        duration: 0.8
-                    }
+            // Animation Navbar: เลื่อนลงจากด้านบน
+            tl.from("nav", {
+                y: -100, // เริ่มจากนอกจอด้านบน
+                opacity: 0, // เริ่มจากโปร่งใส
+                duration: 1 // ใช้เวลา 1 วินาที
+            });
+
+            // Animation หัวข้อ: ขยายและค่อยๆ ปรากฏ
+            tl.from("main h1", { 
+                scale: 0.5, // เริ่มจากขนาดครึ่งนึง
+                opacity: 0, // เริ่มจากโปร่งใส
+                duration: 0.8 // ใช้เวลา 0.8 วินาที
+            }, "-=0.5") // เริ่มก่อน animation ก่อนหน้าเสร็จ 0.5 วินาที
+            // Animation การ์ด: เลื่อนขึ้นและปรากฏแบบต่อเนื่อง
+            .from("main .glass-card", { 
+                y: 50, // เริ่มจากด้านล่าง 50px
+                opacity: 0, // เริ่มจากโปร่งใส
+                stagger: {
+                    each: 0.15, // การ์ดแต่ละใบหน่วงเวลา 0.15 วินาที
+                    from: "start" // เริ่มจากการ์ดแรก
+                },
+                duration: 0.7 // ใช้เวลา 0.7 วินาที
+            }, "-=0.4"); // เริ่มก่อน animation ก่อนหน้าเสร็จ 0.4 วินาที
+
+            // Animation ลอยตัวสำหรับอิโมจิ
+            gsap.to(".emoji-float", {
+                y: -10, // ลอยขึ้น 10px
+                duration: 2.5, // ใช้เวลา 2.5 วินาที
+                yoyo: true, // กลับไปกลับมา
+                repeat: -1, // ทำซ้ำไม่มีที่สิ้นสุด
+                ease: "sine.inOut", // easing แบบนุ่มนวล
+                stagger: {
+                    each: 0.25, // อิโมจิแต่ละตัวหน่วงเวลา 0.25 วินาที
+                    from: "random" // เริ่มแบบสุ่ม
+                }
+            });
+
+            // Hover effect สำหรับการ์ด
+            const cards = document.querySelectorAll('main .glass-card'); 
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', () => {
+                    gsap.to(card, {
+                        scale: 1.03, // ขยาย 3%
+                        duration: 0.3, // ใช้เวลา 0.3 วินาที
+                        ease: "power2.out", // easing แบบนุ่มนวล
+                        boxShadow: "0 12px 40px rgba(31, 38, 135, 0.45)" // เงาใหญ่ขึ้น
+                    });
                 });
-
-                // Background bubbles animation
-                const bubbles = document.querySelectorAll('.bubble');
-                if (bubbles.length > 0) {
-                    tl.fromTo(bubbles, 
-                        { opacity: 0, scale: 0.5 },
-                        { 
-                            opacity: 0.7, 
-                            scale: 1, 
-                            stagger: 0.2, 
-                            duration: 1.5, 
-                            ease: 'elastic.out(1, 0.5)' 
-                        }
-                    );
-                }
-
-                // Main card animation
-                const mainCard = document.querySelector('.main-card');
-                if (mainCard) {
-                    tl.fromTo(mainCard, 
-                        { opacity: 0, y: 50, scale: 0.9 },
-                        { opacity: 1, y: 0, scale: 1, duration: 1, ease: 'back.out(1.7)' },
-                        '-=0.5'
-                    );
-                } else {
-                    console.warn('Main card element not found.');
-                }
-
-                // Logo animation
-                const logo = document.querySelector('.main-card div:first-child');
-                if (logo) {
-                    tl.fromTo(logo,
-                        { opacity: 0, rotate: -180, scale: 0 },
-                        { opacity: 1, rotate: 0, scale: 1, duration: 1, ease: 'back.out(2)' },
-                        '-=0.7'
-                    );
-                }
-
-                // Title animation
-                const title = document.querySelector('h1');
-                if (title) {
-                    tl.fromTo(title,
-                        { opacity: 0, y: 20 },
-                        { opacity: 1, y: 0, duration: 0.8 },
-                        '-=0.5'
-                    );
-                }
-
-                // Subtitle animation
-                const subtitle = document.querySelector('p.text-gray-600');
-                if (subtitle) {
-                    tl.fromTo(subtitle,
-                        { opacity: 0, y: 20 },
-                        { opacity: 1, y: 0, duration: 0.8 },
-                        '-=0.6'
-                    );
-                }
-
-                // Staggered button animations
-                const navButtons = document.querySelectorAll('.nav-btn');
-                if (navButtons.length > 0) {
-                    tl.fromTo(navButtons, 
-                        { opacity: 0, y: 30 },
-                        { 
-                            opacity: 1, 
-                            y: 0, 
-                            stagger: 0.2, 
-                            duration: 0.8, 
-                            ease: 'back.out(1.7)',
-                            clearProps: 'all' 
-                        }, 
-                        '-=0.4'
-                    );
-                } else {
-                    console.warn('Nav buttons not found.');
-                }
-
-                // Footer animation
-                const footer = document.querySelector('.mt-12');
-                if (footer) {
-                    tl.fromTo(footer,
-                        { opacity: 0 },
-                        { opacity: 1, duration: 0.8 },
-                        '-=0.2'
-                    );
-                }
-
-                // Check animation status after completion
-                tl.eventCallback('onComplete', () => {
-                    console.log('All animations completed successfully');
-                });
-
-            } catch (error) {
-                console.error('Animation error:', error);
-                // Fallback: show elements without animation
-                const mainCard = document.querySelector('.main-card');
-                const navButtons = document.querySelectorAll('.nav-btn');
-                const bubbles = document.querySelectorAll('.bubble');
-                if (mainCard) mainCard.style.opacity = '1';
-                navButtons.forEach(btn => btn.style.opacity = '1');
-                bubbles.forEach(bubble => bubble.style.opacity = '1');
-            }
-            
-            // Add mouse parallax effect to bubbles
-            document.addEventListener('mousemove', (e) => {
-                const bubbles = document.querySelectorAll('.bubble');
-                const mouseX = e.clientX / window.innerWidth - 0.5;
-                const mouseY = e.clientY / window.innerHeight - 0.5;
                 
-                bubbles.forEach((bubble, index) => {
-                    const speed = 0.05 * (index + 1);
-                    gsap.to(bubble, {
-                        x: mouseX * 100 * speed,
-                        y: mouseY * 100 * speed,
-                        duration: 1
+                card.addEventListener('mouseleave', () => {
+                    gsap.to(card, {
+                        scale: 1, // กลับสู่ขนาดปกติ
+                        duration: 0.3, // ใช้เวลา 0.3 วินาที
+                        ease: "power2.in", // easing แบบนุ่มนวล
+                        boxShadow: "0 8px 32px rgba(31, 38, 135, 0.37)" // เงากลับสู่ปกติ
                     });
                 });
             });
+
+            // Animation ข้อความ gradient
+            const textGradients = document.querySelectorAll(".text-gradient");
+            if (textGradients.length > 0) {
+                gsap.to(textGradients, {
+                    backgroundPosition: "200% center", // เลื่อนตำแหน่ง gradient
+                    duration: 5, // ใช้เวลา 10 วินาที
+                    repeat: -1, // ทำซ้ำไม่มีที่สิ้นสุด
+                    ease: "linear" // การเคลื่อนไหวแบบคงที่
+                });
+            }
         });
     </script>
 </body>
