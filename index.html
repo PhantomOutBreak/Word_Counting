@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,8 +10,9 @@
     <!-- รวม GSAP ผ่าน CDN เพื่อสร้าง animation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <!-- รวมฟอนต์ Poppins จาก Google Fonts เพื่อใช้ในหน้าเว็บ -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
     <!-- การกำหนดค่า Tailwind CSS แบบ custom -->
     <script>
         tailwind.config = {
@@ -42,58 +44,92 @@
     <style>
         /* กำหนดสไตล์พื้นฐานให้ body */
         body {
-            font-family: 'Poppins', sans-serif; /* ใช้ฟอนต์ Poppins */
-            background: linear-gradient(135deg, #1a1c4b, #4b1945, #4b1c1c); /* พื้นหลังแบบ gradient */
-            background-size: 400% 400%; /* ขยายขนาดพื้นหลังเพื่อให้ animation ลื่นไหล */
-            animation: gradientBG 15s ease infinite; /* เรียก animation gradientBG */
-            min-height: 100vh; /* ให้ความสูงครอบคลุมหน้าจอ */
-            color: white; /* สีข้อความเป็นสีขาว */
-            overflow-x: hidden; /* ป้องกัน scrollbar แนวนอนจากการล้นของ animation */
+            font-family: 'Poppins', sans-serif;
+            /* ใช้ฟอนต์ Poppins */
+            background: linear-gradient(135deg, #1a3b4b, #3e194b, #4b1c1c);
+            /* พื้นหลังแบบ gradient */
+            background-size: 400% 400%;
+            /* ขยายขนาดพื้นหลังเพื่อให้ animation ลื่นไหล */
+            animation: gradientBG 15s ease infinite;
+            /* เรียก animation gradientBG */
+            min-height: 100vh;
+            /* ให้ความสูงครอบคลุมหน้าจอ */
+            color: white;
+            /* สีข้อความเป็นสีขาว */
+            overflow-x: hidden;
+            /* ป้องกัน scrollbar แนวนอนจากการล้นของ animation */
         }
 
         /* Keyframe สำหรับ animation ของพื้นหลัง gradient */
         @keyframes gradientBG {
-            0% { background-position: 0% 50%; } /* ตำแหน่งเริ่มต้น */
-            50% { background-position: 100% 50%; } /* ตำแหน่งกลาง */
-            100% { background-position: 0% 50%; } /* กลับสู่ตำแหน่งเริ่มต้น */
+            0% {
+                background-position: 0% 50%;
+            }
+
+            /* ตำแหน่งเริ่มต้น */
+            50% {
+                background-position: 100% 50%;
+            }
+
+            /* ตำแหน่งกลาง */
+            100% {
+                background-position: 0% 50%;
+            }
+
+            /* กลับสู่ตำแหน่งเริ่มต้น */
         }
 
         /* สไตล์สำหรับ glass card effect */
         .glass-card {
-            background: rgba(255, 255, 255, 0.05); /* พื้นหลังโปร่งใสเล็กน้อย */
-            backdrop-filter: blur(12px); /* เอฟเฟกต์เบลอด้านหลังแบบกระจก */
-            border: 1px solid rgba(255, 255, 255, 0.1); /* ขอบสีขาวโปร่งใส */
-            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37); /* เงาให้ความลึก */
-            transition: background-color 0.3s ease; /* การเปลี่ยนสีพื้นหลังเมื่อ hover */
+            background: rgba(255, 255, 255, 0.05);
+            /* พื้นหลังโปร่งใสเล็กน้อย */
+            backdrop-filter: blur(12px);
+            /* เอฟเฟกต์เบลอด้านหลังแบบกระจก */
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            /* ขอบสีขาวโปร่งใส */
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+            /* เงาให้ความลึก */
+            transition: background-color 0.3s ease;
+            /* การเปลี่ยนสีพื้นหลังเมื่อ hover */
         }
 
         /* Hover effect สำหรับ glass card */
         .glass-card:hover {
-            background: rgba(255, 255, 255, 0.1); /* เปลี่ยนสีพื้นหลังให้สว่างขึ้นเมื่อ hover */
+            background: rgba(255, 255, 255, 0.1);
+            /* เปลี่ยนสีพื้นหลังให้สว่างขึ้นเมื่อ hover */
         }
 
         /* สไตล์สำหรับข้อความ gradient */
         .text-gradient {
-            background: linear-gradient(45deg, #00ffff, #ff00ff, #ffff00); /* gradient สีฟ้า-ชมพู-เหลือง */
-            -webkit-background-clip: text; /* ตัดสีพื้นหลังให้ติดกับข้อความ (สำหรับ Webkit) */
-            background-clip: text; /* ตัดสีพื้นหลังให้ติดกับข้อความ */
-            color: transparent; /* ทำให้ข้อความโปร่งใสเพื่อให้เห็น gradient */
-            background-size: 300% 300%; /* ขยายขนาด gradient เพื่อให้ GSAP ควบคุม animation */
+            background: linear-gradient(45deg, #00ffff, #ff00ff, #ffff00);
+            /* gradient สีฟ้า-ชมพู-เหลือง */
+            -webkit-background-clip: text;
+            /* ตัดสีพื้นหลังให้ติดกับข้อความ (สำหรับ Webkit) */
+            background-clip: text;
+            /* ตัดสีพื้นหลังให้ติดกับข้อความ */
+            color: transparent;
+            /* ทำให้ข้อความโปร่งใสเพื่อให้เห็น gradient */
+            background-size: 300% 300%;
+            /* ขยายขนาด gradient เพื่อให้ GSAP ควบคุม animation */
         }
     </style>
 </head>
-<body class="bg-slate-900"> 
+
+<body class="bg-slate-900">
     <div class="min-h-screen">
         <!-- Navbar ด้วย glass effect -->
         <nav class="glass-card fixed top-0 w-full z-50 px-6 py-4">
             <div class="container mx-auto flex justify-between items-center">
                 <div class="flex items-center space-x-4">
                     <!-- โลโก้แบบวงกลมพร้อม gradient -->
-                    <div class="w-10 h-10 rounded-full bg-gradient-to-r from-cyan-400 to-magenta-400 flex items-center justify-center">
-                        <span class="text-white text-xl font-bold">F</span> <!-- ตัวอักษร F ในโลโก้ -->
+                    <div
+                        class="w-10 h-10 rounded-full bg-gradient-to-r from-cyan-400 to-magenta-400 flex items-center justify-center">
+                        <span class="text-white text-xl font-bold">F</span>
+                        <!-- ตัวอักษร F ในโลโก้ -->
                     </div>
                     <!-- ชื่อเว็บด้วยข้อความ gradient -->
-                    <span class="text-2xl font-bold text-gradient">THE Facility</span>
+                    <span class="text-2xl font-bold text-gradient">THE
+                        Facility</span>
                 </div>
                 <!-- นาฬิกาแสดงเวลา -->
                 <div id="clock" class="text-white text-lg"></div>
@@ -101,7 +137,7 @@
         </nav>
 
         <!-- ส่วนเนื้อหาหลัก -->
-        <main class="container mx-auto pt-24 sm:pt-28 md:pt-32 px-4"> 
+        <main class="container mx-auto pt-24 sm:pt-28 md:pt-32 px-4">
             <div class="glass-card rounded-3xl p-6 sm:p-8 max-w-4xl mx-auto">
                 <!-- หัวข้อหลักด้วยข้อความ gradient -->
                 <h1 class="text-4xl sm:text-5xl font-bold text-center mb-8 text-gradient">
@@ -109,49 +145,70 @@
                 </h1>
 
                 <!-- Grid สำหรับการ์ดเครื่องมือ -->
-                <div class="grid md:grid-cols-2 gap-6 sm:gap-8 mb-16 sm:mb-20"> 
+                <div class="grid md:grid-cols-2 gap-6 sm:gap-8 mb-16 sm:mb-20">
                     <!-- การ์ด Word Counter -->
-                    <a href="view/wordcount.html" class="glass-card rounded-xl p-6 transition-transform">
-                        <div class="text-4xl mb-4 emoji-float">📝</div> <!-- อิโมจิที่ลอยได้ -->
-                        <h3 class="text-xl sm:text-2xl font-bold mb-2">Word Counter</h3>
-                        <p class="text-gray-200 text-sm sm:text-base">Count words, characters, and analyze your text</p>
+                    <a href="view/wordcount.html"
+                        class="glass-card group relative rounded-xl p-6 transition-transform font-bold overflow-hidden">
+                        <div class="text-4xl mb-4 emoji-float">📝</div>
+                        <h3 class="text-xl sm:text-2xl font-bold mb-2">Word
+                            Counter</h3>
+                        <p class="text-gray-200 text-sm sm:text-base">Count
+                            words, characters, and analyze your text</p>
+
+                        <!-- เพิ่ม div นี้เข้าไปภายใน a tag -->
+                        <div class="absolute inset-0 bg-gradient-to-r from-[#e52d27]/30 to-[#b31217]/90
+                         transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-500">
+                        </div>
                     </a>
-                    
+
                     <!-- การ์ด Speed Reader -->
-                    <a href="view/speedread.html" class="glass-card rounded-xl p-6 transition-transform">
-                        <div class="text-4xl mb-4 emoji-float">🚀</div> <!-- อิโมจิที่ลอยได้ -->
-                        <h3 class="text-xl sm:text-2xl font-bold mb-2">Speed Reader</h3>
-                        <p class="text-gray-200 text-sm sm:text-base">Improve your reading speed</p>
+                    <a href="view/speedread.html"
+                        class="glass-card group relative rounded-xl p-6 transition-transform font-bold overflow-hidden">
+                        <div class="text-4xl mb-4 emoji-float">🚀</div>
+                        <h3 class="text-xl sm:text-2xl font-bold mb-2">Speed
+                            Reader</h3>
+                        <p class="text-gray-200 text-sm sm:text-base">Improve
+                            your reading speed</p>
+
+                        <!-- เพิ่ม div นี้เข้าไปภายใน a tag -->
+                        <div class="absolute inset-0 bg-gradient-to-r from-[#00d2ff]/30 to-[#3a7bd5]/90 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-500">
+                        </div>
                     </a>
                 </div>
 
-                <!-- Grid สำหรับคุณสมบัติเด่น -->
-                <div class="grid md:grid-cols-3 gap-6">
-                    <!-- คุณสมบัติ Detailed Analysis -->
-                    <div class="glass-card rounded-xl p-6">
-                        <div class="text-3xl mb-3 emoji-float">📊</div> <!-- อิโมจิที่ลอยได้ -->
-                        <h3 class="text-lg sm:text-xl font-bold mb-2">Detailed Analysis</h3>
-                        <p class="text-gray-200 text-xs sm:text-sm">Comprehensive text insights</p>
-                    </div>
-                    <!-- คุณสมบัติ Time Saving -->
-                    <div class="glass-card rounded-xl p-6">
-                        <div class="text-3xl mb-3 emoji-float">⏱️</div> <!-- อิโมจิที่ลอยได้ -->
-                        <h3 class="text-lg sm:text-xl font-bold mb-2">Time Saving</h3>
-                        <p class="text-gray-200 text-xs sm:text-sm">Efficient text processing</p>
-                    </div>
-                    <!-- คุณสมบัติ Privacy First -->
-                    <div class="glass-card rounded-xl p-6">
-                        <div class="text-3xl mb-3 emoji-float">🔒</div> <!-- อิโมจิที่ลอยได้ -->
-                        <h3 class="text-lg sm:text-xl font-bold mb-2">Privacy First</h3>
-                        <p class="text-gray-200 text-xs sm:text-sm">Local processing only</p>
-                    </div>
-                </div>
-            </div>
+                <!-- <div class=" grid md:grid-cols-3 gap-6">
+                            <div class="glass-card rounded-xl p-6">
+                                <div class="text-3xl mb-3 emoji-float">📊</div>
+
+                                <h3 class="text-lg sm:text-xl font-bold mb-2">Detailed
+                                    Analysis</h3>
+                                <p class="text-gray-200 text-xs sm:text-sm">Comprehensive
+                                    text insights</p>
+                            </div>
+                            <div class="glass-card rounded-xl p-6">
+                                <div class="text-3xl mb-3 emoji-float">⏱️</div>
+
+                                <h3 class="text-lg sm:text-xl font-bold mb-2">Time
+                                    Saving</h3>
+                                <p class="text-gray-200 text-xs sm:text-sm">Efficient
+                                    text processing</p>
+                            </div>
+                            <div class="glass-card rounded-xl p-6">
+                                <div class="text-3xl mb-3 emoji-float">🔒</div>
+
+                                <h3 class="text-lg sm:text-xl font-bold mb-2">Privacy
+                                    First</h3>
+                                <p class="text-gray-200 text-xs sm:text-sm">Local
+                                    processing only</p>
+                            </div>
+                        </div>
+                </div> -->
         </main>
 
         <!-- Footer -->
         <footer class="container mx-auto py-8 text-center text-white/70">
-            <p>© <span id="currentYear">2025</span> THE Facility. All rights reserved.</p> <!-- ปีอัปเดตอัตโนมัติ -->
+            <p>© <span id="currentYear">2025</span> THE Facility. All rights
+                reserved.</p> <!-- ปีอัปเดตอัตโนมัติ -->
         </footer>
     </div>
 
@@ -160,7 +217,7 @@
         // ฟังก์ชันอัปเดตนาฬิกาทุกวินาที
         function updateClock() {
             const clockElement = document.getElementById('clock');
-            if (clockElement) { 
+            if (clockElement) {
                 clockElement.textContent = new Date().toLocaleTimeString('th-TH', { hour12: false }); // แสดงเวลาในรูปแบบ 24 ชม.
             }
         }
@@ -189,21 +246,21 @@
             });
 
             // Animation หัวข้อ: ขยายและค่อยๆ ปรากฏ
-            tl.from("main h1", { 
+            tl.from("main h1", {
                 scale: 0.5, // เริ่มจากขนาดครึ่งนึง
                 opacity: 0, // เริ่มจากโปร่งใส
                 duration: 0.8 // ใช้เวลา 0.8 วินาที
             }, "-=0.5") // เริ่มก่อน animation ก่อนหน้าเสร็จ 0.5 วินาที
-            // Animation การ์ด: เลื่อนขึ้นและปรากฏแบบต่อเนื่อง
-            .from("main .glass-card", { 
-                y: 50, // เริ่มจากด้านล่าง 50px
-                opacity: 0, // เริ่มจากโปร่งใส
-                stagger: {
-                    each: 0.15, // การ์ดแต่ละใบหน่วงเวลา 0.15 วินาที
-                    from: "start" // เริ่มจากการ์ดแรก
-                },
-                duration: 0.7 // ใช้เวลา 0.7 วินาที
-            }, "-=0.4"); // เริ่มก่อน animation ก่อนหน้าเสร็จ 0.4 วินาที
+                // Animation การ์ด: เลื่อนขึ้นและปรากฏแบบต่อเนื่อง
+                .from("main .glass-card", {
+                    y: 50, // เริ่มจากด้านล่าง 50px
+                    opacity: 0, // เริ่มจากโปร่งใส
+                    stagger: {
+                        each: 0.15, // การ์ดแต่ละใบหน่วงเวลา 0.15 วินาที
+                        from: "start" // เริ่มจากการ์ดแรก
+                    },
+                    duration: 0.7 // ใช้เวลา 0.7 วินาที
+                }, "-=0.4"); // เริ่มก่อน animation ก่อนหน้าเสร็จ 0.4 วินาที
 
             // Animation ลอยตัวสำหรับอิโมจิ
             gsap.to(".emoji-float", {
@@ -219,17 +276,17 @@
             });
 
             // Hover effect สำหรับการ์ด
-            const cards = document.querySelectorAll('main .glass-card'); 
+            const cards = document.querySelectorAll('main .glass-card');
             cards.forEach(card => {
                 card.addEventListener('mouseenter', () => {
                     gsap.to(card, {
-                        scale: 1.03, // ขยาย 3%
+                        scale: 1, // ขยาย 3%
                         duration: 0.3, // ใช้เวลา 0.3 วินาที
                         ease: "power2.out", // easing แบบนุ่มนวล
                         boxShadow: "0 12px 40px rgba(31, 38, 135, 0.45)" // เงาใหญ่ขึ้น
                     });
                 });
-                
+
                 card.addEventListener('mouseleave', () => {
                     gsap.to(card, {
                         scale: 1, // กลับสู่ขนาดปกติ
@@ -253,4 +310,5 @@
         });
     </script>
 </body>
+
 </html>
