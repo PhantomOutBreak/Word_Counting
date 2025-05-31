@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const themeToggle = document.getElementById('theme-toggle');
     const htmlEl = document.documentElement;
 
-    // Theme System
+    // Theme System (เหมือนเดิม)
     function getStoredTheme() {
         return localStorage.getItem('theme') || 'auto';
     }
@@ -19,6 +19,11 @@ document.addEventListener('DOMContentLoaded', function () {
         let applied = mode;
         if (mode === 'auto') {
             applied = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        if (applied === 'dark') {
+            document.body.classList.add('dark');
+        } else {
+            document.body.classList.remove('dark');
         }
         htmlEl.setAttribute('data-bs-theme', applied);
         const icons = {
@@ -44,36 +49,45 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Reading Functions
     function startReading() {
-        if (model.currentWordIndex >= model.words.length) resetReading();
         if (model.words.length === 0) {
             model.processText(textInput.value);
             view.updateWordCount(model.words.length);
         }
         if (model.words.length === 0) return;
         model.isPlaying = true;
-        const speed = parseInt(speedSlider.value);
-        const interval = 60000 / speed;
-        model.timerId = setInterval(function () {
-            if (model.currentWordIndex < model.words.length) {
-                view.displayWord(model.words[model.currentWordIndex]);
-                view.updateProgress(model.currentWordIndex, model.words.length);
-                model.currentWordIndex++;
-            } else {
-                pauseReading();
-                pauseTimer();
-                view.showFinish();
-            }
-        }, interval);
+        scheduleNextWord();
     }
     function pauseReading() {
-        clearInterval(model.timerId);
+        clearTimeout(model.timerId);
         model.isPlaying = false;
     }
     function resetReading() {
         pauseReading();
-        model.currentWordIndex = 0;
+        model.resetPosition();
         view.updateProgress(0, model.words.length);
         view.resetDisplay();
+    }
+    function scheduleNextWord() {
+        if (!model.isPlaying) return;
+
+        const word = model.showNextWord();
+        if (word !== "เสร็จสิ้น") {
+            view.displayWord(word);
+            view.updateProgress(model.currentWordIndex, model.words.length);
+
+            const delay = 60000 / speedSlider.value;
+            model.timerId = setTimeout(scheduleNextWord, delay);
+        } else {
+            pauseReading();
+            pauseTimer();
+            view.showFinish();
+
+            // --- เพิ่มส่วนนี้ ---
+            const totalWords = model.words.length;
+            const minutes = model.elapsedTime ? (model.elapsedTime / 60000) : 1;
+            const wpm = Math.round(totalWords / minutes);
+            saveWpmHistory(wpm);
+        }
     }
 
     // Timer Functions
@@ -99,6 +113,27 @@ document.addEventListener('DOMContentLoaded', function () {
         view.updateTimer(minutes, seconds);
     }
 
+    // --- ระบบประวัติ WPM ---
+    function saveWpmHistory(wpm) {
+        let history = JSON.parse(localStorage.getItem('wpm-history') || '[]');
+        history.unshift(wpm);
+        if (history.length > 5) history = history.slice(0, 5);
+        localStorage.setItem('wpm-history', JSON.stringify(history));
+        view.renderWpmHistory(history);
+    }
+
+    function clearWpmHistory() {
+        localStorage.removeItem('wpm-history');
+        view.renderWpmHistory([]);
+    }
+
+    document.getElementById('clear-history').addEventListener('click', clearWpmHistory);
+
+    // เรียกตอนโหลดหน้า
+    view.renderWpmHistory(JSON.parse(localStorage.getItem('wpm-history') || '[]'));
+
+    // เรียก saveWpmHistory(wpm) หลังอ่านจบ (ใน view.showFinish หรือ completeReadingSession)
+
     // Event Listeners
     speedSlider.addEventListener('input', function () {
         view.setSpeedValue(speedSlider.value);
@@ -111,20 +146,20 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!model.isPlaying) {
             startReading();
             startTimer();
-            view.setNavbarReading(true);
+            if (typeof view.setNavbarReading === "function") view.setNavbarReading(true);
         }
     });
     pauseButton.addEventListener('click', function () {
         if (model.isPlaying) {
             pauseReading();
             pauseTimer();
-            view.setNavbarReading(false);
+            if (typeof view.setNavbarReading === "function") view.setNavbarReading(false);
         }
     });
     resetButton.addEventListener('click', function () {
         resetReading();
         resetTimer();
-        view.setNavbarReading(false);
+        if (typeof view.setNavbarReading === "function") view.setNavbarReading(false);
     });
     textInput.addEventListener('input', function () {
         resetReading();

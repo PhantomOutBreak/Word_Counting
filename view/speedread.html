@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Speed Reader - อ่านเร็วขึ้น</title>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -23,429 +26,336 @@
             }
         }
     </script>
+
     <style>
         body {
             font-family: 'Poppins', sans-serif;
             min-height: 100vh;
             color: white;
-            transition: all 0.5s ease;
-        }
-        
-        body.light-mode {
+            /* Default text color for light mode (gradient background) */
+            transition: background-color 0.5s ease, color 0.5s ease;
+            /* Default light mode gradient will be applied if 'dark' class is not present */
             background: linear-gradient(135deg, #1a3b4b, #3e194b, #4b1c1c);
             background-size: 400% 400%;
             animation: gradientBG 15s ease infinite;
         }
-        
-        body.dark-mode {
+
+        body.dark {
+            /* Tailwind utilities like dark:text-gray-200 will work with this */
             background: linear-gradient(135deg, #18181b, #27272a, #1e293b);
             color: #e5e7eb;
+            /* Default text color for dark mode */
         }
-        
+
+        /* No need for body.light-mode specific background if default body style is light mode */
+
         @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
         }
-        
+
         .glass-card {
-            background: rgba(255,255,255,0.08);
+            background: rgba(255, 255, 255, 0.08);
+            /* Default for light mode */
             backdrop-filter: blur(12px);
-            border: 1px solid rgba(255,255,255,0.13);
-            box-shadow: 0 8px 32px rgba(31,38,135,0.18);
+            border: 1px solid rgba(255, 255, 255, 0.13);
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.18);
             border-radius: 1.25rem;
-            transition: background 0.3s;
+            transition: background 0.3s ease, transform 0.2s ease;
         }
-        
+
+        body.dark .glass-card {
+            /* Styles for glass-card in dark mode */
+            background: rgba(40, 40, 40, 0.25);
+            /* Darker glass */
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
         .glass-card:hover {
-            background: rgba(255,255,255,0.14);
+            background: rgba(255, 255, 255, 0.14);
+            /* Light mode hover */
+            transform: translateY(-2px);
         }
-        
+
+        body.dark .glass-card:hover {
+            background: rgba(50, 50, 50, 0.35);
+            /* Dark mode hover */
+        }
+
         .text-gradient {
+            /* GSAP will handle the animation for this */
             background: linear-gradient(45deg, #00ffff, #ff00ff, #ffff00);
-            -webkit-background-clip: text;
             background-clip: text;
+            -webkit-background-clip: text;
+            /* For broader browser support */
             color: transparent;
             background-size: 300% 300%;
+            /* animation: gradientText 5s ease infinite; -- Remove, GSAP will handle */
         }
-        
+
+        /* @keyframes gradientText { -- Remove, GSAP will handle
+            0% { background-position: 0% center; }
+            100% { background-position: 200% center; }
+        } */
+
         .highlight {
             color: #ff0019;
+            /* Default highlight for light mode */
             font-weight: 700;
+        }
+
+        body.dark .highlight {
+            color: #ff4d4d;
+            /* Adjusted highlight for dark mode */
+        }
+
+        .word-transition {
+            transition: opacity 0.1s ease;
+        }
+
+        /* Custom scrollbar thumb for better aesthetics (optional) */
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #06b6d4;
+            /* Cyan-500 */
+            border-radius: 50%;
+            cursor: pointer;
+            margin-top: -6px;
+            /* Adjust to center thumb on track */
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            background: #06b6d4;
+            /* Cyan-500 */
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+            /* Reset default border */
+        }
+
+        input[type="range"]::-ms-thumb {
+            width: 16px;
+            height: 16px;
+            background: #06b6d4;
+            /* Cyan-500 */
+            border-radius: 50%;
+            cursor: pointer;
         }
     </style>
 </head>
-<body class="light-mode">
-    <!-- Navbar -->
-    <nav class="glass-card fixed top-0 w-full z-50 px-6 py-4 transition-colors duration-300">
+
+<body>
+    <nav class="glass-card fixed top-0 w-full z-50 px-6 py-4">
         <div class="container mx-auto flex justify-between items-center">
             <div class="flex items-center space-x-4">
-                <div class="w-10 h-10 rounded-full bg-gradient-to-r from-cyan-400 to-magenta-400 flex items-center justify-center">
+                <div
+                    class="w-10 h-10 rounded-full bg-gradient-to-r from-cyan-400 to-magenta-400 flex items-center justify-center">
                     <span class="text-white text-xl font-bold">F</span>
                 </div>
                 <span class="text-2xl font-bold text-gradient">THE Facility</span>
             </div>
-            <button id="theme-toggle" class="w-10 h-10 rounded-full flex items-center justify-center bg-white/20 hover:bg-white/30 transition-transform">
-                <i id="theme-icon" class="fas fa-sun text-white"></i>
-            </button>
+            <div class="flex items-center space-x-3 sm:space-x-4">
+                <button id="theme-toggle"
+                    class="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center bg-white/20 hover:bg-white/30 dark:bg-gray-700/60 dark:hover:bg-gray-600/80 transition-all transform hover:scale-110"
+                    aria-label="สลับโหมดมืด/สว่าง">
+                    <i id="theme-icon" class="fas fa-sun text-white"></i>
+                </button>
+            </div>
         </div>
     </nav>
 
     <main class="container mx-auto pt-24 sm:pt-28 md:pt-32 px-4">
-        <div class="glass-card rounded-3xl p-6 sm:p-8 max-w-3xl mx-auto mb-8">
+        <section class="glass-card rounded-3xl p-6 sm:p-8 max-w-3xl mx-auto mb-8">
             <h1 class="text-4xl sm:text-5xl font-bold text-center mb-4 text-gradient">Speed Reader</h1>
-            <p class="text-center text-gray-200 mb-6">ฝึกอ่านเร็วด้วยการแสดงทีละคำ พร้อมปรับความเร็วได้</p>
+            <p class="text-center text-gray-300 dark:text-gray-400 mb-6">ฝึกอ่านเร็วด้วยการแสดงทีละคำ
+                พร้อมปรับความเร็วได้</p>
             <div class="flex justify-center mb-6">
                 <span class="text-5xl" id="emoji-float">🚀</span>
             </div>
-            <textarea id="text-input" class="w-full bg-white/10 rounded-lg p-4 text-white placeholder-white/50 focus:ring-2 focus:ring-blue-500 border-none mb-4" rows="4" placeholder="พิมพ์หรือวางข้อความที่นี่..."></textarea>
-            <div class="flex flex-wrap gap-3 mb-4">
-                <button id="start" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 rounded-full flex items-center gap-2 transition-all font-bold">
+            <textarea id="text-input"
+                class="w-full bg-white/10 dark:bg-gray-800/50 rounded-lg p-4 text-white placeholder-white/60 dark:placeholder-gray-400 focus:ring-2 focus:ring-cyan-500 dark:focus:ring-cyan-400 border-none mb-4"
+                rows="4" placeholder="พิมพ์หรือวางข้อความที่นี่..."
+                aria-label="ป้อนข้อความสำหรับการอ่านเร็ว"></textarea>
+            <div class="flex flex-wrap gap-3 mb-4 justify-center sm:justify-start">
+                <button id="start"
+                    class="px-4 py-2 bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 rounded-full flex items-center gap-2 transition-all font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+                    aria-label="เริ่มการอ่าน">
                     <i class="fas fa-play"></i> <span>เริ่มอ่าน</span>
                 </button>
-                <button id="pause" class="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 rounded-full flex items-center gap-2 transition-all font-bold">
-                    <i class="fas fa-pause"></i> <span>หยุดชั่วคราว</span>
+                <button id="pause"
+                    class="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 dark:bg-yellow-600 dark:hover:bg-yellow-700 rounded-full flex items-center gap-2 transition-all font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled aria-label="หยุดชั่วคราว">
+                    <i class="fas fa-pause"></i> <span>หยุด</span>
                 </button>
-                <button id="reset" class="px-4 py-2 bg-gray-500 hover:bg-gray-600 rounded-full flex items-center gap-2 transition-all font-bold">
-                    <i class="fas fa-redo"></i> <span>เริ่มใหม่</span>
+                <button id="reset"
+                    class="px-4 py-2 bg-gray-500 hover:bg-gray-600 dark:bg-gray-600 dark:hover:bg-gray-700 rounded-full flex items-center gap-2 transition-all font-bold"
+                    aria-label="เริ่มใหม่">
+                    <i class="fas fa-redo"></i> <span>ใหม่</span>
                 </button>
-                <a href="wordcount.html" class="px-4 py-2 bg-green-500 hover:bg-green-600 rounded-full flex items-center gap-2 transition-all font-bold">
-                    <i class="fas fa-home"></i> <span>กลับไปที่การนับคำ</span>
+                <button id="save-text"
+                    class="px-4 py-2 bg-purple-500 hover:bg-purple-600 dark:bg-purple-600 dark:hover:bg-purple-700 rounded-full flex items-center gap-2 transition-all font-bold"
+                    aria-label="บันทึกข้อความ">
+                    <i class="fas fa-save"></i> <span>บันทึก</span>
+                </button>
+                <a href="wordcount.html"
+                    class="px-4 py-2 bg-orange-500 hover:bg-orange-600 dark:bg-orange-600 dark:hover:bg-orange-700 rounded-full flex items-center gap-2 transition-all font-bold"
+                    aria-label="wordcount">
+                    <i class="fas fa-file"></i> <span>Wordcount</span>
+                </a>
+                <a href="/index.html"
+                    class="px-4 py-2 bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 rounded-full flex items-center gap-2 transition-all font-bold"
+                    aria-label="HomePage">
+                    <i class="fas fa-home"></i> <span>HomePage</span>
                 </a>
             </div>
             <div class="mb-4">
-                <label for="speed" class="block font-bold text-white mb-2">ความเร็ว (คำต่อนาที)</label>
+                <label for="speed" class="block font-bold text-white dark:text-gray-200 mb-2">ความเร็ว
+                    (คำต่อนาที)</label>
                 <div class="flex items-center gap-4">
-                    <input type="range" id="speed" min="50" max="2000" step="10" value="300" class="w-full h-2 bg-white/20 rounded-lg appearance-none cursor-pointer">
-                    <span id="speed-value" class="px-3 py-1 bg-blue-500 rounded-full text-sm text-white">300</span>
+                    <input type="range" id="speed" min="50" max="2000" step="10" value="300"
+                        class="w-full h-2 bg-white/20 dark:bg-gray-700/50 rounded-lg cursor-pointer appearance-none"
+                        aria-label="ปรับความเร็วการอ่าน">
+                    <span id="speed-value"
+                        class="px-3 py-1 bg-blue-500 dark:bg-blue-600 rounded-full text-sm text-white min-w-[50px] text-center">300</span>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <div class="glass-card rounded-3xl p-6 sm:p-8 max-w-3xl mx-auto mb-8">
+        <section class="glass-card rounded-3xl p-6 sm:p-8 max-w-3xl mx-auto mb-8 reader-section">
             <div class="flex justify-between items-center mb-4">
-                <h5 class="text-lg font-semibold text-white">หน้าจอการอ่าน</h5>
-                <div id="timer" class="px-3 py-1 bg-orange-500 rounded-full text-white hidden">00:00</div>
+                <h2 class="text-lg font-semibold text-white dark:text-gray-100">หน้าจอการอ่าน</h2>
+                <div id="timer" class="px-3 py-1 bg-orange-500 dark:bg-orange-600 rounded-full text-white hidden"
+                    aria-live="polite">00:00</div>
             </div>
-            <div id="display" class="text-5xl min-h-[120px] flex items-center justify-center py-8 text-center text-white">
+            <div id="display"
+                class="text-4xl sm:text-5xl min-h-[100px] sm:min-h-[120px] flex items-center justify-center py-8 text-center text-white dark:text-gray-100 word-transition"
+                aria-live="polite">
                 คำจะแสดงที่นี่
             </div>
-            <div class="w-full bg-white/20 h-2 rounded-full mt-4">
-                <div id="progress-bar" class="bg-blue-500 h-full rounded-full w-0 transition-all"></div>
+            <div class="w-full bg-white/20 dark:bg-gray-700/50 h-2 rounded-full mt-4">
+                <div id="progress-bar"
+                    class="bg-blue-500 dark:bg-blue-600 h-full rounded-full w-0 transition-all duration-300"></div>
             </div>
-            <div class="flex justify-between mt-2 text-sm text-white/70">
+            <div class="flex justify-between mt-2 text-sm text-white/80 dark:text-gray-400">
                 <span id="current-word">0</span>
                 <span id="total-words">0 คำ</span>
             </div>
-        </div>
+        </section>
 
-        <div class="glass-card rounded-3xl p-6 sm:p-8 max-w-3xl mx-auto mb-8">
-            <h5 class="text-lg font-semibold text-white mb-4">เคล็ดลับการอ่านเร็ว</h5>
-            <ul class="list-disc pl-5 space-y-2 text-white">
-                <li>ฝึกอ่านแบบนี้วันละ 10-15 นาทีเพื่อเพิ่มความเร็ว</li>
-                <li>เริ่มต้นด้วยความเร็วที่สบาย ค่อยๆ เพิ่มทีละ 50 คำต่อนาที</li>
-                <li>หลีกเลี่ยงการ subvocalization เพื่ออ่านเร็วขึ้น</li>
-                <li>หลังจากอ่านจบ ลองทบทวนความเข้าใจเนื้อหาที่อ่าน</li>
+        <section class="glass-card rounded-3xl p-6 sm:p-8 max-w-3xl mx-auto mb-8">
+            <h2 class="text-lg font-semibold text-white dark:text-gray-100 mb-4">เคล็ดลับการอ่านเร็ว</h2>
+            <ul class="list-disc pl-5 space-y-2 text-white dark:text-gray-200">
+                <li>ฝึกอ่านวันละ 10-15 นาทีเพื่อเพิ่มความเร็ว</li>
+                <li>เริ่มด้วยความเร็วที่สบาย ค่อยๆ เพิ่มทีละ 50 คำต่อนาที</li>
+                <li>หลีกเลี่ยงการอ่านในใจ (subvocalization) เพื่ออ่านเร็วขึ้น</li>
+                <li>ทบทวนความเข้าใจเนื้อหาหลังอ่านจบ</li>
             </ul>
-        </div>
+        </section>
 
-        <div class="glass-card rounded-3xl p-6 sm:p-8 max-w-3xl mx-auto">
-            <h5 class="text-lg font-semibold text-white mb-4">เกี่ยวกับโปรแกรม</h5>
-            <p class="mb-0 text-white/90">Speed Reader เป็นเครื่องมือออนไลน์ที่ช่วยให้คุณฝึกอ่านเร็วผ่านการแสดงคำทีละคำ เหมาะสำหรับนักเรียนและผู้ที่ต้องการพัฒนาทักษะการอ่าน</p>
-        </div>
+        <section class="glass-card rounded-3xl p-6 sm:p-8 max-w-3xl mx-auto mb-8">
+            <h2 class="text-lg font-semibold text-white dark:text-gray-100 mb-4">เกี่ยวกับโปรแกรม</h2>
+            <p class="text-white/90 dark:text-gray-200">Speed Reader
+                เป็นเครื่องมือออนไลน์ที่ช่วยฝึกอ่านเร็วผ่านการแสดงคำทีละคำ
+                เหมาะสำหรับนักเรียนและผู้ที่ต้องการพัฒนาทักษะการอ่าน</p>
+        </section>
+
+        <section class="glass-card rounded-3xl p-6 sm:p-8 max-w-3xl mx-auto">
+            <h2 class="text-lg font-semibold text-white dark:text-gray-100 mb-4">ประวัติความเร็ว (สูงสุด 5 ครั้ง)</h2>
+            <div class="flex items-center mb-3">
+                <button id="clear-history"
+                    class="px-3 py-1 bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700 rounded-full text-white text-sm font-bold transition-all ml-auto">
+                    ล้างประวัติ
+                </button>
+            </div>
+            <ul id="wpm-history" class="list-disc pl-5 space-y-2 text-white dark:text-gray-200"></ul>
+        </section>
     </main>
 
-    <footer class="container mx-auto py-8 text-center text-white/70">
+    <footer class="container mx-auto py-8 text-center text-white/70 dark:text-gray-400">
         <p>Speed Reader © <span id="currentYear">2025</span> - อ่านเร็วขึ้น เรียนรู้มากขึ้น</p>
     </footer>
 
+    <script src="../model/speedread.model.js"></script>
+    <script src="../view/speedread.view.js"></script>
+    <script src="../controller/speedread.controller.js"></script>
+    
     <script>
+        // ThemeManager, AnimationManager, และการ initialize อื่นๆ ที่ไม่เกี่ยวกับ controller หลัก
         document.addEventListener('DOMContentLoaded', () => {
-            // ===== MVC Architecture =====
-            // Model
-            class SpeedReadModel {
-                constructor() {
-                    this.words = [];
-                    this.currentIndex = 0;
-                    this.speed = 300;
-                    this.isPlaying = false;
-                    this.timer = 0;
-                    this.timerInterval = null;
-                }
-                
-                setText(text) {
-                    this.words = text.trim().split(/\s+/).filter(word => word.length > 0);
-                    this.currentIndex = 0;
-                    return this.words.length;
-                }
-                
-                getCurrentWord() {
-                    return this.currentIndex < this.words.length ? this.words[this.currentIndex] : null;
-                }
-                
-                setSpeed(speed) {
-                    this.speed = parseInt(speed);
-                }
-                
-                getWordCount() {
-                    return this.words.length;
-                }
-                
-                resetPosition() {
-                    this.currentIndex = 0;
-                }
-                
-                moveNext() {
-                    if (this.currentIndex < this.words.length) {
-                        this.currentIndex++;
-                        return true;
-                    }
-                    return false;
-                }
-            }
-
-            // View
-            class SpeedReadView {
-                constructor() {
-                    this.displayArea = document.getElementById('display');
-                    this.progressBar = document.getElementById('progress-bar');
-                    this.currentWordElement = document.getElementById('current-word');
-                    this.totalWordsElement = document.getElementById('total-words');
-                    this.timerElement = document.getElementById('timer');
-                    this.speedValue = document.getElementById('speed-value');
-                }
-                
-                updateWordCount(total) {
-                    this.totalWordsElement.textContent = total + ' คำ';
-                    this.currentWordElement.textContent = '0';
-                }
-                
-                updateProgress(current, total) {
-                    if (total === 0) {
-                        this.progressBar.style.width = '0%';
-                        this.currentWordElement.textContent = '0';
-                        return;
-                    }
-                    const progress = (current / total) * 100;
-                    this.progressBar.style.width = progress + '%';
-                    this.currentWordElement.textContent = current;
-                }
-                
-                displayWord(word) {
-                    if (!word) {
-                        this.displayArea.textContent = "";
-                        return;
-                    }
-                    const orp = Math.max(1, Math.floor(word.length / 3));
-                    const pre = word.substring(0, orp);
-                    const highlight = word.substring(orp, orp + 1);
-                    const post = word.substring(orp + 1);
-                    this.displayArea.innerHTML = pre + '<span class="highlight">' + highlight + '</span>' + post;
-                }
-                
-                showFinish() {
-                    this.displayArea.innerHTML = '<span class="text-success">เสร็จสิ้น! 🎉</span>';
-                }
-                
-                resetDisplay() {
-                    this.displayArea.textContent = "คำจะแสดงที่นี่";
-                }
-                
-                setSpeedValue(val) {
-                    this.speedValue.textContent = val;
-                }
-                
-                showTimer() {
-                    this.timerElement.classList.remove('hidden');
-                }
-                
-                hideTimer() {
-                    this.timerElement.classList.add('hidden');
-                    this.timerElement.textContent = "00:00";
-                }
-                
-                updateTimer(minutes, seconds) {
-                    this.timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-                }
-            }
-
-            // Controller
-            class SpeedReadController {
-                constructor(model, view) {
-                    this.model = model;
-                    this.view = view;
-                    this.timeoutId = null;
-                    
-                    // UI elements
-                    this.textInput = document.getElementById('text-input');
-                    this.startBtn = document.getElementById('start');
-                    this.pauseBtn = document.getElementById('pause');
-                    this.resetBtn = document.getElementById('reset');
-                    this.speedSlider = document.getElementById('speed');
-                    
-                    // Bind event listeners
-                    this.textInput.addEventListener('input', () => this.processText());
-                    this.startBtn.addEventListener('click', () => this.startReading());
-                    this.pauseBtn.addEventListener('click', () => this.pauseReading());
-                    this.resetBtn.addEventListener('click', () => this.resetReading());
-                    this.speedSlider.addEventListener('input', () => this.updateSpeed());
-                    
-                    // Initial setup
-                    this.updateSpeed();
-                }
-                
-                processText() {
-                    const text = this.textInput.value;
-                    const totalWords = this.model.setText(text);
-                    this.view.updateWordCount(totalWords);
-                    this.view.updateProgress(0, totalWords);
-                    this.stopTimer();
-                }
-                
-                startReading() {
-                    if (this.model.isPlaying) return;
-                    
-                    if (this.model.getWordCount() === 0) {
-                        this.processText();
-                        if (this.model.getWordCount() === 0) return;
-                    }
-                    
-                    this.model.isPlaying = true;
-                    this.startTimer();
-                    this.displayNextWord();
-                }
-                
-                pauseReading() {
-                    if (!this.model.isPlaying) return;
-                    
-                    this.model.isPlaying = false;
-                    clearTimeout(this.timeoutId);
-                    this.stopTimer();
-                }
-                
-                resetReading() {
-                    this.pauseReading();
-                    this.model.resetPosition();
-                    this.view.resetDisplay();
-                    this.view.updateProgress(0, this.model.getWordCount());
-                }
-                
-                updateSpeed() {
-                    const speed = this.speedSlider.value;
-                    this.model.setSpeed(speed);
-                    this.view.setSpeedValue(speed);
-                }
-                
-                displayNextWord() {
-                    if (!this.model.isPlaying) return;
-                    
-                    const currentWord = this.model.getCurrentWord();
-                    this.view.displayWord(currentWord);
-                    
-                    const currentIndex = this.model.currentIndex;
-                    const total = this.model.getWordCount();
-                    this.view.updateProgress(currentIndex + 1, total);
-                    
-                    if (this.model.moveNext()) {
-                        const delay = 60000 / this.model.speed; // ms per word
-                        this.timeoutId = setTimeout(() => this.displayNextWord(), delay);
-                    } else {
-                        this.finishReading();
-                    }
-                }
-                
-                finishReading() {
-                    this.model.isPlaying = false;
-                    this.view.showFinish();
-                    this.stopTimer();
-                }
-                
-                startTimer() {
-                    this.view.showTimer();
-                    this.model.timer = 0;
-                    this.model.timerInterval = setInterval(() => {
-                        this.model.timer++;
-                        const minutes = Math.floor(this.model.timer / 60);
-                        const seconds = this.model.timer % 60;
-                        this.view.updateTimer(minutes, seconds);
-                    }, 1000);
-                }
-                
-                stopTimer() {
-                    clearInterval(this.model.timerInterval);
-                    this.view.hideTimer();
-                }
-            }
-
-            // Initialize app
-            const app = new SpeedReadController(
-                new SpeedReadModel(),
-                new SpeedReadView()
-            );
-
-            // ===== Theme Management =====
-            const themeToggle = document.getElementById('theme-toggle');
-            const themeIcon = document.getElementById('theme-icon');
-            const body = document.body;
-            
-            // Initialize theme based on system preference or saved preference
-            function initTheme() {
-                const savedTheme = localStorage.getItem('theme');
-                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                
-                const isDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
-                setTheme(isDark);
-                
-                // Listen for system preference changes
-                window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-                    if (!localStorage.getItem('theme')) { // Only if user hasn't manually set preference
-                        setTheme(e.matches);
-                    }
-                });
-            }
-            
-            // Toggle theme
-            themeToggle.addEventListener('click', () => {
-                const isDark = !body.classList.contains('dark-mode');
-                setTheme(isDark);
-                localStorage.setItem('theme', isDark ? 'dark' : 'light');
-            });
-            
-            // Set theme state
-            function setTheme(isDark) {
-                if (isDark) {
-                    body.classList.remove('light-mode');
-                    body.classList.add('dark-mode');
-                    themeIcon.classList.remove('fa-sun');
-                    themeIcon.classList.add('fa-moon');
-                } else {
-                    body.classList.remove('dark-mode');
-                    body.classList.add('light-mode');
-                    themeIcon.classList.remove('fa-moon');
-                    themeIcon.classList.add('fa-sun');
-                }
-            }
-            
-            initTheme();
-            
-            // ===== Animations =====
-            gsap.from("nav", { y: -100, opacity: 0, duration: 1 });
-            gsap.from("main .glass-card", { 
-                y: 50, opacity: 0, stagger: 0.15, 
-                duration: 0.7, ease: "power3.out" 
-            });
-            gsap.to("#emoji-float", {
-                y: -10, duration: 2.5, yoyo: true,
-                repeat: -1, ease: "sine.inOut"
-            });
-            gsap.to(".text-gradient", {
-                backgroundPosition: "200% center",
-                duration: 5, repeat: -1, ease: "linear"
-            });
-            
-            // Update footer year
+            new ThemeManager();
+            new AnimationManager();
             document.getElementById('currentYear').textContent = new Date().getFullYear();
         });
+        const startButton = document.getElementById('start');
+    </script>
+    <script>
+        class SpeedReadView {
+    displayWord(word) {
+        document.getElementById('display').textContent = word;
+    }
+    updateProgress(current, total) {
+        document.getElementById('current-word').textContent = current;
+        document.getElementById('total-words').textContent = total + ' คำ';
+        const percent = total > 0 ? (current / total) * 100 : 0;
+        document.getElementById('progress-bar').style.width = percent + '%';
+    }
+    updateWordCount(count) {
+        document.getElementById('total-words').textContent = count + ' คำ';
+    }
+    resetDisplay() {
+        document.getElementById('display').textContent = 'คำจะแสดงที่นี่';
+    }
+    showFinish() {
+        document.getElementById('display').textContent = 'เสร็จสิ้น';
+    }
+    setSpeedValue(value) {
+        document.getElementById('speed-value').textContent = value;
+    }
+    showTimer() {
+        document.getElementById('timer').classList.remove('hidden');
+    }
+    hideTimer() {
+        document.getElementById('timer').classList.add('hidden');
+    }
+    updateTimer(min, sec) {
+        document.getElementById('timer').textContent = `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
+    }
+    setNavbarReading(isReading) {
+        // Optional: highlight nav bar or button when reading
+    }
+    toggleButtonsState(isPlaying, hasWords) {
+        document.getElementById('start').disabled = isPlaying || !hasWords;
+        document.getElementById('pause').disabled = !isPlaying;
+    }
+    renderWpmHistory(history) {
+        const ul = document.getElementById('wpm-history');
+        ul.innerHTML = '';
+        if (!history.length) {
+            ul.innerHTML = '<li class="text-gray-400">ยังไม่มีประวัติ</li>';
+            return;
+        }
+        history.forEach((wpm, i) => {
+            const li = document.createElement('li');
+            li.textContent = `ครั้งที่ ${i + 1}: ${wpm} คำ/นาที`;
+            ul.appendChild(li);
+        });
+    }
+}
     </script>
 </body>
+
 </html>

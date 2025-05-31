@@ -5,15 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>THE Facility - Text Analysis Tools</title>
-    <!-- รวม Tailwind CSS ผ่าน CDN เพื่อใช้งาน utility classes -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- รวม GSAP ผ่าน CDN เพื่อสร้าง animation -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <!-- รวมฟอนต์ Poppins จาก Google Fonts เพื่อใช้ในหน้าเว็บ -->
+    <script src="https://cdn.tailwindcss.com" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" defer></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
 
-    <!-- การกำหนดค่า Tailwind CSS แบบ custom -->
     <script>
         tailwind.config = {
             theme: {
@@ -40,7 +36,6 @@
         }
     </script>
 
-    <!-- Custom CSS Styles -->
     <style>
         /* กำหนดสไตล์พื้นฐานให้ body */
         body {
@@ -65,17 +60,14 @@
             0% {
                 background-position: 0% 50%;
             }
-
             /* ตำแหน่งเริ่มต้น */
             50% {
                 background-position: 100% 50%;
             }
-
             /* ตำแหน่งกลาง */
             100% {
                 background-position: 0% 50%;
             }
-
             /* กลับสู่ตำแหน่งเริ่มต้น */
         }
 
@@ -93,7 +85,7 @@
             /* การเปลี่ยนสีพื้นหลังเมื่อ hover */
         }
 
-        /* Hover effect สำหรับ glass card */
+        /* Hover effect สำหรับ glass card (CSS version, GSAP will override for specific cards) */
         .glass-card:hover {
             background: rgba(255, 255, 255, 0.1);
             /* เปลี่ยนสีพื้นหลังให้สว่างขึ้นเมื่อ hover */
@@ -115,104 +107,62 @@
     </style>
 </head>
 
-<body class="bg-slate-900">
-    <div class="min-h-screen">
-        <!-- Navbar ด้วย glass effect -->
+<body class="bg-slate-900"> <div class="min-h-screen">
         <nav class="glass-card fixed top-0 w-full z-50 px-6 py-4">
             <div class="container mx-auto flex justify-between items-center">
                 <div class="flex items-center space-x-4">
-                    <!-- โลโก้แบบวงกลมพร้อม gradient -->
                     <div
                         class="w-10 h-10 rounded-full bg-gradient-to-r from-cyan-400 to-magenta-400 flex items-center justify-center">
                         <span class="text-white text-xl font-bold">F</span>
-                        <!-- ตัวอักษร F ในโลโก้ -->
-                    </div>
-                    <!-- ชื่อเว็บด้วยข้อความ gradient -->
+                        </div>
                     <span class="text-2xl font-bold text-gradient">THE
                         Facility</span>
                 </div>
-                <!-- นาฬิกาแสดงเวลา -->
                 <div id="clock" class="text-white text-lg"></div>
             </div>
         </nav>
 
-        <!-- ส่วนเนื้อหาหลัก -->
         <main class="container mx-auto pt-24 sm:pt-28 md:pt-32 px-4">
             <div class="glass-card rounded-3xl p-6 sm:p-8 max-w-4xl mx-auto">
-                <!-- หัวข้อหลักด้วยข้อความ gradient -->
                 <h1 class="text-4xl sm:text-5xl font-bold text-center mb-8 text-gradient">
                     Text Analysis Tools
                 </h1>
 
-                <!-- Grid สำหรับการ์ดเครื่องมือ -->
                 <div class="grid md:grid-cols-2 gap-6 sm:gap-8 mb-16 sm:mb-20">
-                    <!-- การ์ด Word Counter -->
                     <a href="view/wordcount.html"
-                        class="glass-card group relative rounded-xl p-6 transition-transform font-bold overflow-hidden">
-                        <div class="text-4xl mb-4 emoji-float">📝</div>
-                        <h3 class="text-xl sm:text-2xl font-bold mb-2">Word
-                            Counter</h3>
-                        <p class="text-gray-200 text-sm sm:text-base">Count
-                            words, characters, and analyze your text</p>
-
-                        <!-- เพิ่ม div นี้เข้าไปภายใน a tag -->
+                        class="tool-card glass-card group relative rounded-xl p-6 transition-transform font-bold overflow-hidden">
+                        <div class="relative z-10"> <div class="text-4xl mb-4 emoji-float">📝</div>
+                            <h3 class="text-xl sm:text-2xl font-bold mb-2">Word
+                                Counter</h3>
+                            <p class="text-gray-200 text-sm sm:text-base">Count
+                                words, characters, and analyze your text</p>
+                        </div>
                         <div class="absolute inset-0 bg-gradient-to-r from-[#e52d27]/30 to-[#b31217]/90
-                         transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-500">
+                             transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-500 ease-out">
                         </div>
                     </a>
 
-                    <!-- การ์ด Speed Reader -->
                     <a href="view/speedread.html"
-                        class="glass-card group relative rounded-xl p-6 transition-transform font-bold overflow-hidden">
-                        <div class="text-4xl mb-4 emoji-float">🚀</div>
-                        <h3 class="text-xl sm:text-2xl font-bold mb-2">Speed
-                            Reader</h3>
-                        <p class="text-gray-200 text-sm sm:text-base">Improve
-                            your reading speed</p>
-
-                        <!-- เพิ่ม div นี้เข้าไปภายใน a tag -->
-                        <div class="absolute inset-0 bg-gradient-to-r from-[#00d2ff]/30 to-[#3a7bd5]/90 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-500">
+                        class="tool-card glass-card group relative rounded-xl p-6 transition-transform font-bold overflow-hidden">
+                         <div class="relative z-10"> <div class="text-4xl mb-4 emoji-float">🚀</div>
+                            <h3 class="text-xl sm:text-2xl font-bold mb-2">Speed
+                                Reader</h3>
+                            <p class="text-gray-200 text-sm sm:text-base">Improve
+                                your reading speed</p>
+                        </div>
+                        <div class="absolute inset-0 bg-gradient-to-r from-[#00d2ff]/30 to-[#3a7bd5]/90 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-500 ease-out">
                         </div>
                     </a>
                 </div>
 
-                <!-- <div class=" grid md:grid-cols-3 gap-6">
-                            <div class="glass-card rounded-xl p-6">
-                                <div class="text-3xl mb-3 emoji-float">📊</div>
-
-                                <h3 class="text-lg sm:text-xl font-bold mb-2">Detailed
-                                    Analysis</h3>
-                                <p class="text-gray-200 text-xs sm:text-sm">Comprehensive
-                                    text insights</p>
-                            </div>
-                            <div class="glass-card rounded-xl p-6">
-                                <div class="text-3xl mb-3 emoji-float">⏱️</div>
-
-                                <h3 class="text-lg sm:text-xl font-bold mb-2">Time
-                                    Saving</h3>
-                                <p class="text-gray-200 text-xs sm:text-sm">Efficient
-                                    text processing</p>
-                            </div>
-                            <div class="glass-card rounded-xl p-6">
-                                <div class="text-3xl mb-3 emoji-float">🔒</div>
-
-                                <h3 class="text-lg sm:text-xl font-bold mb-2">Privacy
-                                    First</h3>
-                                <p class="text-gray-200 text-xs sm:text-sm">Local
-                                    processing only</p>
-                            </div>
-                        </div>
-                </div> -->
+                </div> 
         </main>
 
-        <!-- Footer -->
         <footer class="container mx-auto py-8 text-center text-white/70">
             <p>© <span id="currentYear">2025</span> THE Facility. All rights
-                reserved.</p> <!-- ปีอัปเดตอัตโนมัติ -->
-        </footer>
+                reserved.</p> </footer>
     </div>
 
-    <!-- JavaScript -->
     <script>
         // ฟังก์ชันอัปเดตนาฬิกาทุกวินาที
         function updateClock() {
@@ -221,7 +171,8 @@
                 clockElement.textContent = new Date().toLocaleTimeString('th-TH', { hour12: false }); // แสดงเวลาในรูปแบบ 24 ชม.
             }
         }
-        setInterval(updateClock, 0); // อัปเดตทุก 1 วินาที
+        // *** แก้ไข: เปลี่ยน interval จาก 0 เป็น 1000 มิลลิวินาที ***
+        setInterval(updateClock, 1000); // อัปเดตทุก 1 วินาที 
         updateClock(); // เรียกครั้งแรกทันที
 
         // อัปเดตปีปัจจุบันใน Footer
@@ -250,17 +201,25 @@
                 scale: 0.5, // เริ่มจากขนาดครึ่งนึง
                 opacity: 0, // เริ่มจากโปร่งใส
                 duration: 0.8 // ใช้เวลา 0.8 วินาที
-            }, "-=0.5") // เริ่มก่อน animation ก่อนหน้าเสร็จ 0.5 วินาที
-                // Animation การ์ด: เลื่อนขึ้นและปรากฏแบบต่อเนื่อง
-                .from("main .glass-card", {
-                    y: 50, // เริ่มจากด้านล่าง 50px
-                    opacity: 0, // เริ่มจากโปร่งใส
-                    stagger: {
-                        each: 0.15, // การ์ดแต่ละใบหน่วงเวลา 0.15 วินาที
-                        from: "start" // เริ่มจากการ์ดแรก
-                    },
-                    duration: 0.7 // ใช้เวลา 0.7 วินาที
-                }, "-=0.4"); // เริ่มก่อน animation ก่อนหน้าเสร็จ 0.4 วินาที
+            }, "-=0.5"); // เริ่มก่อน animation ก่อนหน้าเสร็จ 0.5 วินาที
+            
+            // Animation การ์ดหลักที่ครอบเนื้อหา: เลื่อนขึ้นและปรากฏ
+            tl.from("main > .glass-card", { // Target the main container glass-card
+                y: 50,
+                opacity: 0,
+                duration: 0.7
+            }, "-=0.6"); // Adjust timing as needed
+
+            // Animation การ์ดเครื่องมือ (Word Counter, Speed Reader): เลื่อนขึ้นและปรากฏแบบต่อเนื่อง
+            tl.from("main .tool-card.glass-card", { // Target only the tool cards specifically
+                y: 50, // เริ่มจากด้านล่าง 50px
+                opacity: 0, // เริ่มจากโปร่งใส
+                stagger: {
+                    each: 0.15, // การ์ดแต่ละใบหน่วงเวลา 0.15 วินาที
+                    from: "start" // เริ่มจากการ์ดแรก
+                },
+                duration: 0.6 // ใช้เวลา 0.6 วินาที
+            }, "-=0.4"); // เริ่มก่อน animation ก่อนหน้าเสร็จ 0.4 วินาที
 
             // Animation ลอยตัวสำหรับอิโมจิ
             gsap.to(".emoji-float", {
@@ -275,25 +234,31 @@
                 }
             });
 
-            // Hover effect สำหรับการ์ด
-            const cards = document.querySelectorAll('main .glass-card');
-            cards.forEach(card => {
+            // Hover effect สำหรับการ์ดเครื่องมือ (เฉพาะ tool cards)
+            // *** แก้ไข: เลือกเฉพาะการ์ดที่เป็นลิงก์ (tool cards) และปรับ scale effect ***
+            const toolCards = document.querySelectorAll('main a.tool-card.glass-card');
+            toolCards.forEach(card => {
+                // GSAP handles scale and shadow, CSS group-hover handles swipe
+                const content = card.querySelector('.relative.z-10'); // Content to keep above swipe
+
                 card.addEventListener('mouseenter', () => {
                     gsap.to(card, {
-                        scale: 1, // ขยาย 3%
-                        duration: 0.3, // ใช้เวลา 0.3 วินาที
-                        ease: "power2.out", // easing แบบนุ่มนวล
-                        boxShadow: "0 12px 40px rgba(31, 38, 135, 0.45)" // เงาใหญ่ขึ้น
+                        scale: 1.03, // ขยาย 3%
+                        duration: 0.3,
+                        ease: "power2.out",
+                        boxShadow: "0 12px 40px rgba(31, 38, 135, 0.45)" 
                     });
+                     if(content) gsap.to(content, { zIndex: 20, duration:0 }); // Ensure content stays on top
                 });
 
                 card.addEventListener('mouseleave', () => {
                     gsap.to(card, {
                         scale: 1, // กลับสู่ขนาดปกติ
-                        duration: 0.3, // ใช้เวลา 0.3 วินาที
-                        ease: "power2.in", // easing แบบนุ่มนวล
-                        boxShadow: "0 8px 32px rgba(31, 38, 135, 0.37)" // เงากลับสู่ปกติ
+                        duration: 0.3,
+                        ease: "power2.in",
+                        boxShadow: "0 8px 32px rgba(31, 38, 135, 0.37)" 
                     });
+                    if(content) gsap.to(content, { zIndex: 10, duration:0 });
                 });
             });
 
@@ -302,7 +267,7 @@
             if (textGradients.length > 0) {
                 gsap.to(textGradients, {
                     backgroundPosition: "200% center", // เลื่อนตำแหน่ง gradient
-                    duration: 5, // ใช้เวลา 10 วินาที
+                    duration: 5, // ใช้เวลา 5 วินาที (ปรับจาก 10 เพื่อให้เห็นการเคลื่อนไหวเร็วขึ้นเล็กน้อย)
                     repeat: -1, // ทำซ้ำไม่มีที่สิ้นสุด
                     ease: "linear" // การเคลื่อนไหวแบบคงที่
                 });
@@ -310,5 +275,4 @@
         });
     </script>
 </body>
-
 </html>
