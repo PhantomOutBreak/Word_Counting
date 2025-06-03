@@ -129,7 +129,6 @@
     }
 
     // ===== Auto Save Logic =====
-    let autoSaveTimerId;
     const saveStatusConfig = {
         saving: { icon: '<svg class="w-3 h-3 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>', defaultMsg: 'กำลังบันทึก...', classes: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/60 dark:text-yellow-300' },
         error: { icon: '<svg class="w-3 h-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M5.07 19.07a10 10 0 1113.86 0H5.07z" /></svg>', defaultMsg: 'บันทึกไม่สำเร็จ', classes: 'bg-red-100 text-red-700 dark:bg-red-900/60 dark:text-red-300' },
@@ -179,19 +178,12 @@
         }
     }
 
-    function setupAutoSaveListener() {
-        clearTimeout(autoSaveTimerId);
-        if (elements.autoSaveToggle.checked) {
-            const interval = parseInt(elements.autoSaveIntervalSelect.value);
-            autoSaveTimerId = setInterval(performSaveContent, interval);
-        }
-    }
-
     // Debounced handler for text input
     const debouncedProcessText = debounce(() => {
         const text = elements.textInput.value;
         const stats = calculateAllStats(text);
         updateStatsDisplay(stats);
+        performSaveContent(); // <-- Save every time stats are updated (on input)
     }, 300);
 
     // ===== Event Listeners Setup =====
@@ -201,7 +193,7 @@
         elements.clearBtn.addEventListener('click', () => {
             elements.textInput.value = '';
             debouncedProcessText();
-            performSaveContent();
+            // performSaveContent(); <-- Already called in debouncedProcessText
             showToast('ล้างข้อความแล้ว', 'info');
             elements.textInput.focus();
         });
@@ -261,15 +253,12 @@
             };
         });
 
-        elements.autoSaveToggle.addEventListener('change', setupAutoSaveListener);
-        elements.autoSaveIntervalSelect.addEventListener('change', setupAutoSaveListener);
         elements.manualSaveBtn.addEventListener('click', performSaveContent);
 
-        // Load saved text and initialize auto-save
+        // Load saved text
         const savedText = localStorage.getItem('wordcounter-text') || '';
         elements.textInput.value = savedText;
         debouncedProcessText();
-        setupAutoSaveListener();
     }
 
     // ===== Initial Page Animations =====

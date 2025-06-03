@@ -206,11 +206,6 @@
                     aria-label="เริ่มใหม่">
                     <i class="fas fa-redo"></i> <span>ใหม่</span>
                 </button>
-                <button id="save-text"
-                    class="px-4 py-2 bg-purple-500 hover:bg-purple-600 dark:bg-purple-600 dark:hover:bg-purple-700 rounded-full flex items-center gap-2 transition-all font-bold"
-                    aria-label="บันทึกข้อความ">
-                    <i class="fas fa-save"></i> <span>บันทึก</span>
-                </button>
                 <a href="wordcount.html"
                     class="px-4 py-2 bg-orange-500 hover:bg-orange-600 dark:bg-orange-600 dark:hover:bg-orange-700 rounded-full flex items-center gap-2 transition-all font-bold"
                     aria-label="wordcount">
@@ -290,9 +285,61 @@
     </footer>
 
     <script src="../model/speedread.model.js"></script>
-    <script src="../view/speedread.view.js"></script>
+    <script>
+        class SpeedReadView {
+            displayWord(word) {
+                document.getElementById('display').textContent = word;
+            }
+            updateProgress(current, total) {
+                document.getElementById('current-word').textContent = current;
+                document.getElementById('total-words').textContent = total + ' คำ';
+                const percent = total > 0 ? (current / total) * 100 : 0;
+                document.getElementById('progress-bar').style.width = percent + '%';
+            }
+            updateWordCount(count) {
+                document.getElementById('total-words').textContent = count + ' คำ';
+            }
+            resetDisplay() {
+                document.getElementById('display').textContent = 'คำจะแสดงที่นี่';
+            }
+            showFinish() {
+                document.getElementById('display').textContent = 'เสร็จสิ้น';
+            }
+            setSpeedValue(value) {
+                document.getElementById('speed-value').textContent = value;
+            }
+            showTimer() {
+                document.getElementById('timer').classList.remove('hidden');
+            }
+            hideTimer() {
+                document.getElementById('timer').classList.add('hidden');
+            }
+            updateTimer(min, sec) {
+                document.getElementById('timer').textContent = `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
+            }
+            setNavbarReading(isReading) {
+                // Optional: highlight nav bar or button when reading
+            }
+            toggleButtonsState(isPlaying, hasWords) {
+                document.getElementById('start').disabled = isPlaying || !hasWords;
+                document.getElementById('pause').disabled = !isPlaying;
+            }
+            renderWpmHistory(history) {
+                const ul = document.getElementById('wpm-history');
+                ul.innerHTML = '';
+                if (!history.length) {
+                    ul.innerHTML = '<li class="text-gray-400">ยังไม่มีประวัติ</li>';
+                    return;
+                }
+                history.forEach((wpm, i) => {
+                    const li = document.createElement('li');
+                    li.textContent = `ครั้งที่ ${i + 1}: ${wpm} คำ/นาที`;
+                    ul.appendChild(li);
+                });
+            }
+        }
+    </script>
     <script src="../controller/speedread.controller.js"></script>
-    
     <script>
         // ThemeManager, AnimationManager, และการ initialize อื่นๆ ที่ไม่เกี่ยวกับ controller หลัก
         document.addEventListener('DOMContentLoaded', () => {
@@ -300,61 +347,15 @@
             new AnimationManager();
             document.getElementById('currentYear').textContent = new Date().getFullYear();
         });
-        const startButton = document.getElementById('start');
     </script>
     <script>
-        class SpeedReadView {
-    displayWord(word) {
-        document.getElementById('display').textContent = word;
+        pauseButton.addEventListener('click', function () {
+    if (model.isPlaying) {
+        pauseReading();
+        pauseTimer();
+        if (typeof view.setNavbarReading === "function") view.setNavbarReading(false);
     }
-    updateProgress(current, total) {
-        document.getElementById('current-word').textContent = current;
-        document.getElementById('total-words').textContent = total + ' คำ';
-        const percent = total > 0 ? (current / total) * 100 : 0;
-        document.getElementById('progress-bar').style.width = percent + '%';
-    }
-    updateWordCount(count) {
-        document.getElementById('total-words').textContent = count + ' คำ';
-    }
-    resetDisplay() {
-        document.getElementById('display').textContent = 'คำจะแสดงที่นี่';
-    }
-    showFinish() {
-        document.getElementById('display').textContent = 'เสร็จสิ้น';
-    }
-    setSpeedValue(value) {
-        document.getElementById('speed-value').textContent = value;
-    }
-    showTimer() {
-        document.getElementById('timer').classList.remove('hidden');
-    }
-    hideTimer() {
-        document.getElementById('timer').classList.add('hidden');
-    }
-    updateTimer(min, sec) {
-        document.getElementById('timer').textContent = `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
-    }
-    setNavbarReading(isReading) {
-        // Optional: highlight nav bar or button when reading
-    }
-    toggleButtonsState(isPlaying, hasWords) {
-        document.getElementById('start').disabled = isPlaying || !hasWords;
-        document.getElementById('pause').disabled = !isPlaying;
-    }
-    renderWpmHistory(history) {
-        const ul = document.getElementById('wpm-history');
-        ul.innerHTML = '';
-        if (!history.length) {
-            ul.innerHTML = '<li class="text-gray-400">ยังไม่มีประวัติ</li>';
-            return;
-        }
-        history.forEach((wpm, i) => {
-            const li = document.createElement('li');
-            li.textContent = `ครั้งที่ ${i + 1}: ${wpm} คำ/นาที`;
-            ul.appendChild(li);
-        });
-    }
-}
+});
     </script>
 </body>
 
